@@ -1,0 +1,23 @@
+{
+  "name": "mapviewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "dependencies": {
+    "express": "^4.13.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thedzim/MapViewer.git"
+  },
+  "author": "Daniel Zimmerman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thedzim/MapViewer/issues"
+  },
+  "homepage": "https://github.com/thedzim/MapViewer#readme"
+}
