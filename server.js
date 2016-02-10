@@ -21,15 +21,6 @@ function send404(response){
 	response.end();
 };
 
-//listener function
-// app.use(function(req, res) {
-// 	if(req.method == 'GET' && req.url == '/'){
-// 		res.writeHead(200, {'Content-type': 'text/html'});
-// 		// fs.createReadStream('./index.html').pipe(res);
-// 	}else{
-// 		send404(res);
-// 	}
-// });
 // start server and listen on port 8081
 app.listen(8081, function(){
 	console.log('Server running at http://127.0.0.1:8081/');
