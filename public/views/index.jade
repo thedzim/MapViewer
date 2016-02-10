@@ -2,7 +2,12 @@ doctype html
 html(lang="en")
 	head
 		title= title
+		script(src='/libs/leaflet/leaflet.js')
+		script(src='/javascript/worker.js')
 	body
 		h1 Title Goes Here
 		#container.col
-			p Hello World
+			ul 
+				li worker
+				li master
+			div#map

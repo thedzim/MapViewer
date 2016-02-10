@@ -4,7 +4,7 @@ var fs = require("fs"),
 	morgan = require('morgan'),
 	app = express(),
 	path = require('path'),
-	homepage = require('./routes/index')
+	homepage = require('./routes/routes')
 
 app.set('views', __dirname + '/public/views');
 app.set('view engine', 'jade');
@@ -25,3 +25,4 @@ function send404(response){
 app.listen(8081, function(){
 	console.log('Server running at http://127.0.0.1:8081/');
 });
+
