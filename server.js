@@ -15,7 +15,8 @@ app.use(morgan('short'));
 //add the middleware to serve files from specified paths
 app.use(express.static(path.join(__dirname, '/public')));
 app.use('/', homepage);
-io.on('connection', function(socket){
+app.use('/master', homepage);
+io.on('connection', function(socket){	
 	console.log(socket.handshake.address +': connected');
 	socket.on('disconnect', function(){
     	console.log(socket.handshake.address +': disconnected');
