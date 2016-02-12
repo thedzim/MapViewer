@@ -18,8 +18,13 @@ app.use('/', homepage);
 app.use('/master', homepage);
 io.on('connection', function(socket){	
 	console.log(socket.handshake.address +': connected');
+	socket.emit('news', {hello: "event to all clients"});
 	socket.on('disconnect', function(){
     	console.log(socket.handshake.address +': disconnected');
+  	});
+  	socket.on('masterConnection', function(data){
+  		console.log(data);
+  		io.sockets.emit("news", "master beckons");
   	});
 });
 

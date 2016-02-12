@@ -23,6 +23,11 @@ var instantiateMap = function(){
     // Return the map
     return map;
 };
+
 $(document).ready(function(){
     instantiateMap();
+    var socket = io.connect('http://localhost');
+    socket.on('news', function(data) {
+        console.log(data);
+    });
 });
