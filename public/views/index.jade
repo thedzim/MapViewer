@@ -1,9 +1,6 @@
 doctype html
 html(lang="en")
-	head
-		title= title
-		script(src='/libs/leaflet/leaflet.js')
-		script(src='/javascript/worker.js')
+	include head
 	body
 		h1 Title Goes Here
 		#container.col
@@ -11,3 +8,5 @@ html(lang="en")
 				li worker
 				li master
 			div#map
+	script.
+		var socket = io();
