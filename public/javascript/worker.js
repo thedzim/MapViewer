@@ -26,7 +26,7 @@ var instantiateMap = function(){
 
 $(document).ready(function(){
     instantiateMap();
-    var socket = io.connect('http://localhost');
+    var socket = io('/worker');
     socket.on('news', function(data) {
         console.log(data);
     });

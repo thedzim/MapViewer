@@ -6,7 +6,8 @@ var fs = require("fs"),
 	http = require('http').Server(app),
 	io = require('socket.io')(http),
 	path = require('path'),
-	homepage = require('./routes/routes')
+	homepage = require('./routes/routes'),
+	connections = [];
 
 app.set('views', __dirname + '/public/views');
 app.set('view engine', 'jade');
@@ -16,17 +17,37 @@ app.use(morgan('short'));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use('/', homepage);
 app.use('/master', homepage);
-io.on('connection', function(socket){	
-	console.log(socket.handshake.address +': connected');
-	socket.emit('news', {hello: "event to all clients"});
+
+io.of('/worker').on('connection', function(socket){	
+	var address = socket.handshake.address;
+	var socketid = socket.id;
+	var userObject = {
+			socketid : socketid,
+			address : address
+		};
+	console.log(userObject + " connected on /worker");
+	connections.push(userObject);
+	console.log(connections);
 	socket.on('disconnect', function(){
-    	console.log(socket.handshake.address +': disconnected');
+    	console.log(address +': disconnected');
+    	// delete the session from list of connections
+    	for(var i = 0; i < connections.length; i ++){
+    		if(connections[i].socketid == socket.id){
+    			delete connections[i];
+    		}
+    	}
   	});
   	socket.on('masterConnection', function(data){
   		console.log(data);
-  		io.sockets.emit("news", "master beckons");
+  		socket.emit("news", "master beckons");
   	});
 });
+
+io.of('/master').on('connection', function(socket) {
+	var address = socket.handshake.address;
+	console.log("Master connected from " + address);
+	socket.emit('workerConnections', connections);
+})
 
 // 404 request
 function send404(response){

@@ -4,7 +4,15 @@ html(lang="en")
 	body
 		h1 Title Goes Here
 		#container.col
-		button.sendMessage(onclick='sendMessage()') Click me to Send a message
+			button.sendMessage(onclick='sendMessage()') Click me to Send a message
 
-			
-	
+		div#listOfWorkers
+			if workers
+				ul
+					-each worker in workers.length ? workers : ["No workers"]
+						li worker
+
+			if connections
+				ul
+					-each ip in connections
+						li ip
