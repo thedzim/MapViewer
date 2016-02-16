@@ -12,7 +12,8 @@ var instantiateMap = function(){
         layers: "OSM-WMS",
         format: "image/png",
         transparent: true,
-        noWrap: true
+        noWrap: true,
+        tms: false
     }).addTo(map);
     
     baseMaps["Terrestris Streets"] = openStreetWgs84;
@@ -28,6 +29,9 @@ $(document).ready(function(){
     instantiateMap();
     var socket = io('/worker');
     socket.on('news', function(data) {
+        console.log(data);
+    });
+    socket.on("hello", function(data) {
         console.log(data);
     });
 });

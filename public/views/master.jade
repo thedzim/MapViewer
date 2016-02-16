@@ -3,16 +3,7 @@ html(lang="en")
 	include masterHead
 	body
 		h1 Title Goes Here
-		#container.col
-			button.sendMessage(onclick='sendMessage()') Click me to Send a message
-
-		div#listOfWorkers
-			if workers
-				ul
-					-each worker in workers.length ? workers : ["No workers"]
-						li worker
-
-			if connections
-				ul
-					-each ip in connections
-						li ip
+		
+		div#listOfWorkers List of Available workers
+			ul(data-bind="foreach: workers").list-group
+				li(data-bind="text: address").list-group-item

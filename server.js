@@ -7,6 +7,7 @@ var fs = require("fs"),
 	io = require('socket.io')(http),
 	path = require('path'),
 	homepage = require('./routes/routes'),
+	socketController = require('./socketController'),
 	connections = [];
 
 app.set('views', __dirname + '/public/views');
@@ -18,35 +19,18 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use('/', homepage);
 app.use('/master', homepage);
 
-io.of('/worker').on('connection', function(socket){	
-	var address = socket.handshake.address;
-	var socketid = socket.id;
-	var userObject = {
-			socketid : socketid,
-			address : address
-		};
-	console.log(userObject + " connected on /worker");
-	connections.push(userObject);
-	console.log(connections);
-	socket.on('disconnect', function(){
-    	console.log(address +': disconnected');
-    	// delete the session from list of connections
-    	for(var i = 0; i < connections.length; i ++){
-    		if(connections[i].socketid == socket.id){
-    			delete connections[i];
-    		}
-    	}
-  	});
-  	socket.on('masterConnection', function(data){
-  		console.log(data);
-  		socket.emit("news", "master beckons");
-  	});
+var worker = io.of('/worker').on('connection', function(socket){	
+	socketController.workerConnection(socket, connections);
+	// socketController.broadcast(master, "workerConnection", connections);
 });
 
-io.of('/master').on('connection', function(socket) {
+var master = io.of('/master').on('connection', function(socket) {
 	var address = socket.handshake.address;
 	console.log("Master connected from " + address);
+	// send the worker connections to the master
+	socketController.broadcast(master, "workerConnection", connections);
 	socket.emit('workerConnections', connections);
+	io.emit("news");
 })
 
 // 404 request
