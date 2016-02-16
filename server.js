@@ -29,9 +29,11 @@ var master = io.of('/master').on('connection', function(socket) {
 	console.log("Master connected from " + address);
 	// send the worker connections to the master
 	socketController.broadcast(master, "workerConnection", connections);
+	socketController.broadcast(worker, "startAutoViewer")
 	socket.emit('workerConnections', connections);
 	io.emit("news");
-})
+});
+
 
 // 404 request
 function send404(response){
