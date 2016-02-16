@@ -6,14 +6,17 @@ function MasterViewModel() {
     var socket = io('/master');
     // socket.emit('masterConnection', "master connected");
     socket.on('workerConnections', function(data) {
-        $.each(data, function(index, workerObject) {
-        	self.workers.push(workerObject);
-        });
-        console.log(data);
+       self.updateWorkers(data);
     });
     socket.on("workerDisconnected", function(data) {
-    	
-    }
+    	self.updateWorkers(data);
+    });
+
+   	MasterViewModel.prototype.updateWorkers = function(workerList) {
+   		$.each(workerList, function(index, workerObject) {
+        	self.workers.push(workerObject);
+        });
+   	};
 	return self;
 };
 

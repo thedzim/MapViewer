@@ -22,7 +22,7 @@ module.exports.broadcast = function(endpoint, title, message) {
 }
 
 removeConnectionFromList = function(socketid, connections) {
-	for(var i = connections.length; i > connections.length; i --){
+	for(var i = connections.length - 1; i >= 0; i --){
 		if(connections[i].socketid == socketid){
 			console.log(connections[i].address + " disconnected");
 			connections.splice(i, 1);
