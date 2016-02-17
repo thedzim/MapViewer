@@ -3,6 +3,7 @@ var $ = jQuery;
 function WorkerViewModel() {
     var self = this;
     self.map = self.initializeMap();
+    self.map.setView({lat: 38, lon: -77}, 7);
 };
 
 WorkerViewModel.prototype.initializeMap = function(){
@@ -29,23 +30,41 @@ WorkerViewModel.prototype.initializeMap = function(){
     return map;
 };
 
-WorkerViewModel.prototype.operateMap = function(map){
+WorkerViewModel.prototype.operateMap = function(){
+    // initialize some variables
     var self = this;
-    var lat = 38, lon = 77, zoom = 10;
-    var setNewView = setInterval(function(){
-        lat = Math.floor((Math.random() * 40) + 30)
-        lon = Math.floor((Math.random() * 80) + 70)
-        zoom = Math.floor((Math.random() * 13) + 1)
-        map.panTo({lat: lat, lon: lon}, zoom);
-    }, 4000);
-
-    for(var i = 100; i < 100; i++){
+    var map = self.map;
+    var fixed = 5;
+    var latlng = map.getCenter();
+    var lat = latlng.lat, lng = latlng.lng;
+    var zoom = map.getZoom();
+    var options = {
+            reset: false,
+            pan: {
+                duration: 1, 
+                easeLinearity: .1
+            },
+            animate: true
+        };
+    function setNewView() {
+        setInterval(function(){
+            // generate two new latlng values within +/- 2.5 degrees of the current coords
+            lat = getRandomInRange(lat -2.5, lat + 2.5, fixed);
+            lng = getRandomInRange(lng -2.5, lng + 2.5, fixed);
+            // new zoom level within the levels of 5 and 8 for easier ability to read the map
+            zoom = Math.abs(getRandomInRange(5, 8, 0));
+            map.setView({lat: lat, lon: lng}, zoom, options)
+        }, 4000);
+    };
+    for(var i = 0; i < 20; i++){
         setNewView();
     }
-    map.panTo({lon: -77.309209, lat: 38.824291}, 12);
-
-    return self;
 };
+
+function getRandomInRange(from, to, fixed) {
+    return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
+    // .toFixed() returns string, so ' * 1' is a trick to convert to number
+}
 
 
 $(document).ready(function(){
@@ -54,7 +73,5 @@ $(document).ready(function(){
     socket.on('news', function(data) {
         console.log(data);
     });
-    socket.on("startAutoViewer", function(data) {
-        workerViewModel.operateMap(workerViewModel.map);
-    });
+    ko.applyBindings(workerViewModel);
 });
