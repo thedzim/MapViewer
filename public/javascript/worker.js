@@ -4,6 +4,7 @@ function WorkerViewModel() {
     var self = this;
     self.map = self.initializeMap();
     self.map.setView({lat: 38, lon: -77}, 7);
+    self.active = ko.observable(false);
 };
 
 WorkerViewModel.prototype.initializeMap = function(){
@@ -58,6 +59,9 @@ WorkerViewModel.prototype.operateMap = function(){
     };
     for(var i = 0; i < 20; i++){
         setNewView();
+        if(!self.active()){
+            return;
+        }
     }
 };
 
@@ -72,6 +76,12 @@ $(document).ready(function(){
     var socket = io('/worker');
     socket.on('news', function(data) {
         console.log(data);
+    });
+    socket.on("startAutoViewer", function(data) {
+        workerViewModel.operateMap(workerViewModel.map);
+    });
+    socket.on("stopAutoViewer", function(data){
+        workerViewModel.active(false);
     });
     ko.applyBindings(workerViewModel);
 });
