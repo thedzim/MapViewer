@@ -57,7 +57,7 @@ function handler (req, res) {
 	});
 }
 
-var worker = io.of('/').on('connection', function (socket) {
+var worker = io.of('/worker').on('connection', function (socket) {
 	socketController.workerConnection(socket);
 	socketController.broadcast(master, "workerConnected", socketController.connections)
 });

@@ -32,9 +32,8 @@ module.exports.masterConnection = function(socket) {
 		};
 		
 	console.log("{"+ userObject.socketid + ": " + userObject.address + "} connected on /master");
-	self.connections.push(userObject);
 	socket.on('disconnect', function(){
-    	removeConnectionFromList(socketid);
+    	console.log("{"+ userObject.socketid + ": " + userObject.address + "} disconnected on /master");
   	});
 	
 };
