@@ -1,9 +1,0 @@
-doctype html
-html(lang="en")
-	include masterHead
-	body
-		
-		div#listOfWorkers List of Available workers
-			ul(data-bind="foreach: workers").list-group
-				li(data-bind="text: address").list-group-item
-		button#start(onclick="startAllWorkers") Start All Workers
