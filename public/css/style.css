@@ -4,8 +4,6 @@
 }
 
 .waiting, .testing {
-	height: 6rem;
-    margin-right: 4.5rem;
     background-color: #1C2126;
     border-radius: .25rem;
     padding-top: 2rem;
@@ -31,3 +29,34 @@
     width: 60%;
     padding: 10px;
 }
+
+.masterForm {
+    height: 6rem;
+    border-radius: .25rem;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+/*
+div.tableDiv {
+    height: 10em;
+    width: 4em;
+    position: relative 
+}
+div.tableDiv {
+    margin: 0;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%) 
+    color: white;
+}
+
+.masterContainer {
+    background-color: #1C2126;
+    color: white;
+    height: 50rem;
+}*/
