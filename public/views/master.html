@@ -1,5 +1,6 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/libs/jquery.js"></script>
+<script src="/libs/knockout.js"></script>
 <script src="/javascript/master.js"></script>
 <link rel="stylesheet" type="text/css" href="/css/style.css"></link>
 <link rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
@@ -18,32 +19,26 @@
 	  <button id="button" class="btn btn-primary">Start Tests</button>
 	</form>
 
-	<div class="tableDiv">
-		<table class="table table-condensed">
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>IP</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<th scope="row">1</th>
-					<td>127.0.0.1</td>
-				</tr>
-				<tr>
-					<th scope="row">2</th>
-					<td>127.0.0.1</td>
-				</tr>
-				<tr>
-					<th scope="row">3</th>
-					<td>127.0.0.1</td>
-				</tr>
-				<tr>
-					<th scope="row">4</th>
-					<td>127.0.0.1</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+	<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}"></div>
 </div>
+
+<script type="text/html" id="ip-table-template">
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Connected IP</th>
+			</tr>
+		</thead>
+		<tbody data-bind="foreach: {data: ipList}">
+			<tr>
+				<td>
+					<span data-bind="text: $index"></span>
+				</td>
+				<td>
+					<span data-bind="text: $data.address"></span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</script>

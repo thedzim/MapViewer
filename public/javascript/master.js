@@ -1,14 +1,14 @@
 var socket = io('/master');
-var ipList = [];
+var masterViewModel = {
+	ipList : ko.observableArray()
+};
+
 
 socket.on('news', function (data) {
 	console.log(data);
 });
 socket.on('workerConnected', function(data) {
-	$.each(data, function(index, connection){
-		ipList.push(connection.address);
-		console.log(connection)
-	});
+	masterViewModel.ipList(data);
 });
 
 
@@ -17,4 +17,5 @@ $(document).ready(function(){
 	$("#button").on("click", function(){
 		socket.emit("masterStart", "START");
 	});
+	ko.applyBindings(masterViewModel);	
 })
