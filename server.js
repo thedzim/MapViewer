@@ -59,15 +59,12 @@ function handler (req, res) {
 
 var worker = io.of('/').on('connection', function (socket) {
 	socketController.workerConnection(socket);
-	socket.on('my other event', function (data) {
-		console.log(data);
-  	});
+	socketController.broadcast(master, "workerConnected", socketController.connections)
 });
 
 
 var master = io.of('/master').on('connection', function(socket) {
 	socketController.masterConnection(socket);
-	socketController.broadcast(master, "news", "message")
 	socket.on('masterStart', function (data) {
 		socketController.masterStart(worker);
 	});
