@@ -6,6 +6,10 @@ socket.on('news', function (data) {
 socket.on('start', function(data){
 	var map = initializeMap();
 	$("#waitingMessage").hide();
+	$("#testingMessage").show();
+	setTimeout(function(){
+		$("#testingGIF").hide()
+	}, 3000);
 	operateMap(map);
 });
 

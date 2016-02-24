@@ -1,5 +1,33 @@
 #map {
 	width: 900px;
 	height: 700px;
-	position: fixed;
+}
+
+.waiting, .testing {
+	height: 6rem;
+    margin-right: 4.5rem;
+    background-color: #1C2126;
+    border-radius: .25rem;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.testing {
+	display: none;
+}
+
+.testing, .waiting > h1 {
+	color: white;
+}
+
+.loading{
+	height: 100px;
+}
+
+.center {
+    margin: auto;
+    width: 60%;
+    padding: 10px;
 }
