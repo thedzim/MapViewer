@@ -3,14 +3,14 @@ var app = require('http').createServer(handler);
 var static = require('node-static');
 var file = new(static.Server)();
 // socket
-var io = require('socket.io')(app);
+// var io = require('socket.io');
 // file system
 var fs = require('fs');
 // path
 var path = require('path');
 
 // socket controller
-var socketController = require('./socketController');
+var socketController = require('./socketController').listen(app);
 
 // listen to port 8081
 app.listen(8081, function(){
@@ -69,25 +69,6 @@ function handler (req, res) {
 		return;
 	});
 }
-
-var worker = io.of('/worker').on('connection', function (socket) {
-	socketController.workerConnection(socket);
-	socketController.broadcast(master, "workerConnected", socketController.connections)
-	socket.on('running', function(data){
-		socketController.broadcast(master, "socketRunning", {socketid: socket.id, message: "running"});
-	});
-});
-
-
-var master = io.of('/master').on('connection', function(socket) {
-	socketController.masterConnection(socket);
-	socket.on('masterStart', function (data) {
-		socketController.broadcast(worker, "start", data);
-	});
-	socket.on('masterStop', function (data) {
-		socketController.broadcast(worker, "stop", data);
-	});
-});
 
 
 

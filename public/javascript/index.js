@@ -2,9 +2,7 @@
 var socket = io('/worker');
 var autoViewer;
 var map;
-socket.on('news', function (data) {
-	console.log(data);
-});
+
 socket.on('start', function(data){
     console.log(data);
     wmsURL = data.url;
@@ -20,7 +18,8 @@ socket.on('start', function(data){
 socket.on("stop", function(data){
     console.log(autoViewer);
     clearInterval(autoViewer);
-    map = undefined;
+    map.remove();
+    $("#map").hide();
     socket.emit("stopped", "stopped");
     toggleMessage();
 });
@@ -52,6 +51,7 @@ function initializeMap(wmsURL) {
     var zoomControl = new L.control.zoom({ position: 'topleft' });
     map.addControl(zoomControl);
     // Return the map
+    $("#map").show();
     return map;
 };
 

@@ -1,71 +1,6 @@
-/**
-* @param {Connection} socket the connection
-*/
-// public exports
-
-module.exports.workerConnection = function(socket) {
-    // this function expects a socket connection as argument
-    var self = this;
-	var address = socket.request.connection.remoteAddress;
-	var socketid = socket.id;
-	var userObject = {
-			socketid : socketid,
-			address : address,
-			active: "danger" //highlights red on bootstrap to indicate NOT active
-		};
-
-	console.log("{"+ userObject.socketid + ": " + userObject.address + "} connected on /worker");
-	self.connections.push(userObject);
-	socket.on('disconnect', function(){
-    	removeConnectionFromList(socketid);
-  	});
-	
-};
-
-module.exports.masterConnection = function(socket) {
-    // this function expects a socket connection as argument
-    var self = this;
-	var address = socket.request.connection.remoteAddress;
-	var socketid = socket.id;
-	var userObject = {
-			socketid : socketid,
-			address : address,
-		};
-		
-	console.log("{"+ userObject.socketid + ": " + userObject.address + "} connected on /master");
-	socket.on('disconnect', function(){
-    	console.log("{"+ userObject.socketid + ": " + userObject.address + "} disconnected on /master");
-  	});
-	
-};
-
-module.exports.masterStart = function(endpoint, data) {
-	var self = this;
-	// start all connections
-	self.connections.forEach(function(connection){
-		self.broadcast(endpoint, "start", data);
-	});
-}
-
-module.exports.broadcast = function(endpoint, title, message) {
-	endpoint.emit(title, message);
-}
-
-/**
-* event list
-*
-* worker connect
-* worker disconnect
-* push results
-*
-* master start
-* master stop
-* master request workers
-**/
-
-
 // private
 var self = this;
+var socketio = require('socket.io')
 self.connections = [];
 removeConnectionFromList = function(socketid) {
 	for(var i = self.connections.length - 1; i >= 0; i --){
@@ -76,3 +11,88 @@ removeConnectionFromList = function(socketid) {
 		}
     }
 };
+
+// public exports
+
+module.exports.listen = function(app){
+	io = socketio.listen(app);
+
+	var worker = io.of('/worker').on('connection', function (socket) {
+		workerConnection(socket);
+		broadcast(master, "workerConnected", self.connections)
+	});
+
+
+	var master = io.of('/master').on('connection', function(socket) {
+		masterConnection(socket);
+	});
+
+	function workerConnection(socket) {
+	    // this function expects a socket connection as argument
+		var address = socket.request.connection.remoteAddress;
+		var socketid = socket.id;
+		var userObject = {
+				socketid : socketid,
+				address : address,
+				active: "danger" //highlights red on bootstrap to indicate NOT active
+			};
+
+		console.log("{"+ userObject.socketid + ": " + userObject.address + "} connected on /worker");
+		self.connections.push(userObject);
+		socket.on('disconnect', function(){
+	    	removeConnectionFromList(socketid);
+	  	});
+	  	socket.on('running', function(data){
+			broadcast(master, "socketRunning", {socketid: socket.id, message: "running"});
+		});
+		
+	};
+
+	function masterConnection(socket) {
+	    // this function expects a socket connection as argument
+		var address = socket.request.connection.remoteAddress;
+		var socketid = socket.id;
+		var userObject = {
+				socketid : socketid,
+				address : address,
+			};
+			
+		console.log("{"+ userObject.socketid + ": " + userObject.address + "} connected on /master");
+		socket.on('disconnect', function(){
+	    	console.log("{"+ userObject.socketid + ": " + userObject.address + "} disconnected on /master");
+	  	});
+	  	socket.on('masterStart', function (data) {
+			broadcast(worker, "start", data);
+		});
+		socket.on('masterStop', function (data) {
+			broadcast(worker, "stop", data);
+		});
+		
+	};
+
+	function masterStart(endpoint, data) {
+		// start all connections
+		self.connections.forEach(function(connection){
+			broadcast(endpoint, "start", data);
+		});
+	};
+
+ 	function broadcast(endpoint, title, message) {
+		endpoint.emit(title, message);
+	}
+	return io;
+}
+
+/**
+* event list
+* worker connect
+* worker disconnect
+* push results
+*
+* master start
+* master stop
+* master request workers
+**/
+
+
+
