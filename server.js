@@ -82,7 +82,10 @@ var worker = io.of('/worker').on('connection', function (socket) {
 var master = io.of('/master').on('connection', function(socket) {
 	socketController.masterConnection(socket);
 	socket.on('masterStart', function (data) {
-		socketController.masterStart(worker, data);
+		socketController.broadcast(worker, "start", data);
+	});
+	socket.on('masterStop', function (data) {
+		socketController.broadcast(worker, "stop", data);
 	});
 });
 

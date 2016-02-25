@@ -39,7 +39,7 @@ $(document).ready(function(){
 	$("#stop").on("click", function(e){
 		var url = masterViewModel.wmsURL();
 		var bbox = masterViewModel.boundingBox();
-		socket.emit("masterStart", {url: url,  bbox: bbox});
+		socket.emit("masterStop", {url: url,  bbox: bbox});
 		toggleMessage();
 		e.preventDefault();
 	});

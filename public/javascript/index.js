@@ -1,6 +1,7 @@
 
 var socket = io('/worker');
 var autoViewer;
+var map;
 socket.on('news', function (data) {
 	console.log(data);
 });
@@ -8,7 +9,7 @@ socket.on('start', function(data){
     console.log(data);
     wmsURL = data.url;
     bbox = data.bbox;
-	var map = initializeMap(wmsURL);
+	map = initializeMap(wmsURL);
 	toggleMessage();
 	setTimeout(function(){
 		$("#testingGIF").hide()
@@ -17,10 +18,11 @@ socket.on('start', function(data){
     socket.emit("running", "running");
 });
 socket.on("stop", function(data){
+    console.log(autoViewer);
     clearInterval(autoViewer);
+    map = undefined;
     socket.emit("stopped", "stopped");
     toggleMessage();
-
 });
 
 function toggleMessage() {
@@ -75,7 +77,7 @@ function operateMap(workermap) {
             animate: true
         };
     function setNewView() {
-        autoViwer = setInterval(function(){
+        autoViewer = setInterval(function(){
             // generate two new latlng values within +/- 2.5 degrees of the current coords
             lat = getRandomInRange(lat -2.5, lat + 2.5, fixed);
             lng = getRandomInRange(lng -2.5, lng + 2.5, fixed);
@@ -84,7 +86,6 @@ function operateMap(workermap) {
             map.setView({lat: lat, lon: lng}, zoom, options)
         }, 4000);
     };
-    for(var i = 0; i < 20; i++){
-        setNewView();
-    }
+
+    setNewView();
 };

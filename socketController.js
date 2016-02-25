@@ -42,7 +42,6 @@ module.exports.masterConnection = function(socket) {
 module.exports.masterStart = function(endpoint, data) {
 	var self = this;
 	// start all connections
-	console.log("master start connecitons: ");
 	self.connections.forEach(function(connection){
 		self.broadcast(endpoint, "start", data);
 	});
