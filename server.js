@@ -22,24 +22,37 @@ function handler (req, res) {
 	// file.serve(req, res)
 	var requestedPath = '/public/';
 	var urlPath = path.parse(req.url);
+	var contentType = '';
 	switch(urlPath.dir){
 		case '/':
-			switch(urlPath.base.length){
-				case 0: 
+			switch(urlPath.base){
+				case 'master': 
+					requestedPath += 'views/master.html'
+					contentType = "text/html"
+					break;
+				case 'favicon.ico' :
+					requestedPath += urlPath.base
+					break;
+				case '' :
 					requestedPath += 'views/index.html'
+					contentType = "text/html"
 					break;
 				default:
 					requestedPath += 'views/' + urlPath.base +'.html'
+					contentType = "text/html"
 			}
 			break;
 		case "/libs" : 
 			requestedPath += 'libs/' + urlPath.base
+			contentType = "application/javascript"
 			break;
 		case '/javascript' : 
 			requestedPath += 'javascript/' + urlPath.base
+			contentType = "application/javascript"
 			break;
 		case '/css' : 
 			requestedPath += 'css/' + urlPath.base
+			contentType = "text/css"
 			break;
 		default:
 			requestedPath += 'views/index.html';
@@ -51,7 +64,7 @@ function handler (req, res) {
   			res.writeHead(500);
   			return res.end('Internal Server Error. Cannot process request.');
 		}
-		res.writeHead(200);
+		res.writeHead(200, {"Content-length" : data.length, "content-type" : contentType});
 		res.end(data);
 		return;
 	});
@@ -60,13 +73,16 @@ function handler (req, res) {
 var worker = io.of('/worker').on('connection', function (socket) {
 	socketController.workerConnection(socket);
 	socketController.broadcast(master, "workerConnected", socketController.connections)
+	socket.on('running', function(data){
+		socketController.broadcast(master, "socketRunning", {socketid: socket.id, message: "running"});
+	});
 });
 
 
 var master = io.of('/master').on('connection', function(socket) {
 	socketController.masterConnection(socket);
 	socket.on('masterStart', function (data) {
-		socketController.masterStart(worker);
+		socketController.masterStart(worker, data);
 	});
 });
 

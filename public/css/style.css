@@ -26,8 +26,7 @@
 
 .center {
     margin: auto;
-    width: 60%;
-    padding: 10px;
+    width: 50%;
 }
 
 .masterForm {
@@ -39,24 +38,23 @@
     text-align: center;
 }
 
-/*
-div.tableDiv {
-    height: 10em;
-    width: 4em;
-    position: relative 
-}
 div.tableDiv {
     margin: 0;
     position: absolute;
-    top: 30%;
+    padding-top: 2rem;
     left: 50%;
     margin-right: -50%;
-    transform: translate(-50%, -50%) 
     color: white;
+    height: 10em;
 }
 
 .masterContainer {
     background-color: #1C2126;
     color: white;
-    height: 50rem;
-}*/
+    display: block;
+}
+
+.tableContainer {
+    display: block;
+    color: red;
+}

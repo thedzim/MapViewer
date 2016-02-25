@@ -11,6 +11,7 @@ module.exports.workerConnection = function(socket) {
 	var userObject = {
 			socketid : socketid,
 			address : address,
+			active: "danger" //highlights red on bootstrap to indicate NOT active
 		};
 
 	console.log("{"+ userObject.socketid + ": " + userObject.address + "} connected on /worker");
@@ -38,12 +39,12 @@ module.exports.masterConnection = function(socket) {
 	
 };
 
-module.exports.masterStart = function(endpoint) {
+module.exports.masterStart = function(endpoint, data) {
 	var self = this;
 	// start all connections
 	console.log("master start connecitons: ");
 	self.connections.forEach(function(connection){
-		self.broadcast(endpoint, "start", "start");
+		self.broadcast(endpoint, "start", data);
 	});
 }
 

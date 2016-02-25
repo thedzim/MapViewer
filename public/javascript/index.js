@@ -1,27 +1,42 @@
 
 var socket = io('/worker');
+var autoViewer;
 socket.on('news', function (data) {
 	console.log(data);
 });
 socket.on('start', function(data){
-	var map = initializeMap();
-	$("#waitingMessage").hide();
-	$("#testingMessage").show();
+    console.log(data);
+    wmsURL = data.url;
+    bbox = data.bbox;
+	var map = initializeMap(wmsURL);
+	toggleMessage();
 	setTimeout(function(){
 		$("#testingGIF").hide()
 	}, 3000);
 	operateMap(map);
+    socket.emit("running", "running");
+});
+socket.on("stop", function(data){
+    clearInterval(autoViewer);
+    socket.emit("stopped", "stopped");
+    toggleMessage();
+
 });
 
+function toggleMessage() {
+    $("#waitingMessage").toggle();
+    $("#testingMessage").toggle();
+}
 
-function initializeMap() {
+function initializeMap(wmsURL) {
     var map = L.map('map', {
         zoomControl: false, // Zoom control will be added further down in this function to allow for the proper ordering of controls
         attributionControl: false,
     }).setView([0, 0], 3);
 
+    var url = wmsURL ? wmsURL : "http://ows.terrestris.de/osm/service"
     var baseMaps = {};
-    var openStreetWgs84 = new L.TileLayer.WMS("http://ows.terrestris.de/osm/service", {
+    var openStreetWgs84 = new L.TileLayer.WMS(wmsURL, {
         layers: "OSM-WMS",
         format: "image/png",
         transparent: true,
@@ -60,7 +75,7 @@ function operateMap(workermap) {
             animate: true
         };
     function setNewView() {
-        setInterval(function(){
+        autoViwer = setInterval(function(){
             // generate two new latlng values within +/- 2.5 degrees of the current coords
             lat = getRandomInRange(lat -2.5, lat + 2.5, fixed);
             lng = getRandomInRange(lng -2.5, lng + 2.5, fixed);

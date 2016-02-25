@@ -5,25 +5,34 @@
 <link rel="stylesheet" type="text/css" href="/css/style.css"></link>
 <link rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
 
-<div class="container-fluid masterContainer">
-	<form role="form" data-toggle="validator" class="masterForm">
-	  <div class="form-group">
-	    <label for="url">WMS URL</label>
-	    <input type="url" class="form-control" id="url" required>
-	  </div>
-	  <div class="form-group">
-	    <label for="bbox">Bounding box:</label>
-	    <input type="password" class="form-control" id="bbox">
-	  </div>
-	  
-	  <button id="button" class="btn btn-primary">Start Tests</button>
-	</form>
-
-	<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}"></div>
+<div class="row">
+	<div class="container-fluid masterContainer">
+		<form role="form" data-toggle="validator" class="masterForm" id="masterForm">
+		  <div class="form-group">
+		    <label for="url">WMS URL</label>
+		    <input type="url" data-bind="wmsURL" placeholder="ex: http://ows.terrestris.de/osm/service" class="form-control" id="url" required>
+		  </div>
+		  <div class="form-group">
+		    <label for="bbox">Bounding box:</label>
+		    <input type="text" data-bind="boundingBox" placeholder="Lat, Lng" class="form-control" id="bbox">
+		  </div>
+		  
+		  <button id="start" class="btn btn-primary">Start Tests</button>
+		</form>
+		<div id="testingMessage" class="testing hidden">
+			<h1>Test in Progress</h1>
+			<button id="stop" class="btn btn-primary">Stop Tests</button>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="container-fluid tableContainer">
+		<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}"></div>
+	</div>
 </div>
 
 <script type="text/html" id="ip-table-template">
-	<table class="table table-condensed">
+	<table class="table table-striped">
 		<thead>
 			<tr>
 				<th>#</th>
@@ -31,7 +40,7 @@
 			</tr>
 		</thead>
 		<tbody data-bind="foreach: {data: ipList}">
-			<tr>
+			<tr data-bind="css: $data.active">
 				<td>
 					<span data-bind="text: $index"></span>
 				</td>
