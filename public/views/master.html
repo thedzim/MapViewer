@@ -10,11 +10,11 @@
 		<form role="form" data-toggle="validator" class="masterForm" id="masterForm">
 		  <div class="form-group">
 		    <label for="url">WMS URL</label>
-		    <input type="url" data-bind="wmsURL" placeholder="ex: http://ows.terrestris.de/osm/service" class="form-control" id="url" required>
+		    <input type="url" data-bind="value: wmsURL" placeholder="ex: http://ows.terrestris.de/osm/service" class="form-control" id="url" required>
 		  </div>
 		  <div class="form-group">
 		    <label for="bbox">Bounding box:</label>
-		    <input type="text" data-bind="boundingBox" placeholder="Lat, Lng" class="form-control" id="bbox">
+		    <input type="text" data-bind="value: boundingBox" placeholder="38.65, -76.67" class="form-control" id="bbox">
 		  </div>
 		  
 		  <button id="start" class="btn btn-primary">Start Tests</button>
@@ -40,7 +40,7 @@
 			</tr>
 		</thead>
 		<tbody data-bind="foreach: {data: ipList}">
-			<tr data-bind="css: $data.active">
+			<tr>
 				<td>
 					<span data-bind="text: $index"></span>
 				</td>

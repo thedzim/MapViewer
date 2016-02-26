@@ -32,8 +32,7 @@ module.exports.listen = function(app){
 		var socketid = socket.id;
 		var userObject = {
 				socketid : socketid,
-				address : address,
-				active: "danger" //highlights red on bootstrap to indicate NOT active
+				address : address
 			};
 
 		console.log("{"+ userObject.socketid + ": " + userObject.address + "} connected on /worker");

@@ -4,10 +4,7 @@ var autoViewer;
 var map;
 
 socket.on('start', function(data){
-    console.log(data);
-    wmsURL = data.url;
-    bbox = data.bbox;
-	map = initializeMap(wmsURL);
+	map = initializeMap(data);
 	toggleMessage();
 	setTimeout(function(){
 		$("#testingGIF").hide()
@@ -16,7 +13,6 @@ socket.on('start', function(data){
     socket.emit("running", "running");
 });
 socket.on("stop", function(data){
-    console.log(autoViewer);
     clearInterval(autoViewer);
     map.remove();
     $("#map").hide();
@@ -29,15 +25,17 @@ function toggleMessage() {
     $("#testingMessage").toggle();
 }
 
-function initializeMap(wmsURL) {
+function initializeMap(data) {
+    var url = data.wmsURL ? data.wmsURL : "http://ows.terrestris.de/osm/service"
+    var boundingbox = data.bbox;
+    var bbox = boundingbox ? boundingbox.split(',') : [38.65, -76.67];
     var map = L.map('map', {
         zoomControl: false, // Zoom control will be added further down in this function to allow for the proper ordering of controls
         attributionControl: false,
-    }).setView([0, 0], 3);
+    }).setView(bbox, 3);
 
-    var url = wmsURL ? wmsURL : "http://ows.terrestris.de/osm/service"
     var baseMaps = {};
-    var openStreetWgs84 = new L.TileLayer.WMS(wmsURL, {
+    var openStreetWgs84 = new L.TileLayer.WMS(url, {
         layers: "OSM-WMS",
         format: "image/png",
         transparent: true,
