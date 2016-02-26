@@ -22,7 +22,6 @@ module.exports.listen = function(app){
 		broadcast(master, "workerConnected", self.connections)
 	});
 
-
 	var master = io.of('/master').on('connection', function(socket) {
 		masterConnection(socket);
 	});
@@ -41,11 +40,11 @@ module.exports.listen = function(app){
 		self.connections.push(userObject);
 		socket.on('disconnect', function(){
 	    	removeConnectionFromList(socketid);
+	    	broadcast(master, "workerConnected", self.connections);
 	  	});
 	  	socket.on('running', function(data){
 			broadcast(master, "socketRunning", {socketid: socket.id, message: "running"});
 		});
-		
 	};
 
 	function masterConnection(socket) {
