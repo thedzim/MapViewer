@@ -4,7 +4,7 @@ var autoViewer;
 var map;
 
 socket.on('start', function(data){
-	map = initializeMap(data);
+    map = initializeMap(data);
 	toggleMessage();
 	setTimeout(function(){
 		$("#testingGIF").hide()
@@ -26,7 +26,7 @@ function toggleMessage() {
 }
 
 function initializeMap(data) {
-    var url = data.wmsURL ? data.wmsURL : "http://ows.terrestris.de/osm/service"
+    var url = data.url ? data.url : "http://ows.terrestris.de/osm/service"
     var boundingbox = data.bbox;
     var bbox = boundingbox ? boundingbox.split(',') : [38.65, -76.67];
     var map = L.map('map', {
