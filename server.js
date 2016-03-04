@@ -54,10 +54,13 @@ function handler (req, res) {
 			requestedPath += 'css/' + urlPath.base
 			contentType = "text/css"
 			break;
+		case '/img' :
+			requestedPath += 'img/' + urlPath.base
+			contentType = "image/png"
+			break;
 		default:
 			requestedPath += 'views/index.html';
 	}
-	
 	fs.readFile(__dirname + requestedPath,
 	function (err, data) {
 		if (err) {
