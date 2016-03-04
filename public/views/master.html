@@ -2,8 +2,13 @@
 <script src="/libs/jquery.js"></script>
 <script src="/libs/knockout.js"></script>
 <script src="/javascript/master.js"></script>
+<script src="/javascript/mapController.js"></script>
+<script type="text/javascript" src='/libs/leaflet.js'></script>
+<script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
 <link rel="stylesheet" type="text/css" href="/css/style.css"></link>
 <link rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
+<link rel="stylesheet" type="text/css" href="/css/leaflet.css"></link>
+<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.draw/leaflet.draw.css"></link>
 
 <div class="row">
 	<div class="container-fluid masterContainer">
@@ -15,8 +20,9 @@
 		  <div class="form-group">
 		    <label for="bbox">Bounding box:</label>
 		    <input type="text" data-bind="value: boundingBox" placeholder="38.65, -76.67" class="form-control" id="bbox">
+		    <span class="icon-globe icon-white" data-bind="click: toggleMap"></span>
+		    <div class="center" id="map" data-bind="visible: mapVisibile"></div>
 		  </div>
-		  
 		  <button id="start" class="btn btn-primary">Start Tests</button>
 		</form>
 		<div id="testingMessage" class="testing hidden">
@@ -26,8 +32,10 @@
 	</div>
 </div>
 <div class="row">
-	<div class="container-fluid tableContainer">
-		<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}"></div>
+	<div class="row">
+		<div class="container-fluid tableContainer">
+			<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}, visible: tableVisible"></div>
+		</div>
 	</div>
 </div>
 
