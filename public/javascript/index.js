@@ -10,6 +10,8 @@ socket.on('start', function(data){
 	setTimeout(function(){
 		$("#testingGIF").hide()
 	}, 3000);
+    console.log(data);
+    MapController.drawBBOX(map, data.bounds);
 	MapController.operateMap(map);
     socket.emit("running", "running");
 });

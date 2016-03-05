@@ -1,9 +1,5 @@
 var MapController = new function(){
 	var self = this;
-	var bounds;
-	var southWest;
-	var northEast; 
-	var bbox;
 	
 	self.initializeMap = function() {
 	    var map = L.map('map', {
@@ -36,29 +32,10 @@ var MapController = new function(){
 		var drawControl = new L.Control.Draw({
 			position: 'topright',
 			draw: {
-				polygon: {
-					shapeOptions: {
-						color: 'purple'
-					},
-					allowIntersection: false,
-					drawError: {
-						color: 'orange',
-						timeout: 1000
-					},
-					showArea: true,
-					metric: false,
-					repeatMode: true
-				},
-				rect: {
-					shapeOptions: {
-						color: 'green'
-					},
-				},
-				circle: {
-					shapeOptions: {
-						color: 'steelblue'
-					},
-				},
+				polygon: false,
+				polyline: false,
+				circle: false,
+				marker: false,
 			},
 			edit: {
 				featureGroup: drawnItems
@@ -67,26 +44,25 @@ var MapController = new function(){
 		map.addControl(drawControl);
 
 		map.on('draw:created', function (e) {
-			var type = e.layerType,
-				layer = e.layer;
-			drawnItems.addLayer(layer);
-			self.bounds = layer.getBounds();
-			self.southWest = [self.bounds._southWest.lat.toFixed(3) * 1, self.bounds._southWest.lng.toFixed(3) * 1];
-			self.northEast = [self.bounds._northEast.lat.toFixed(3) * 1, self.bounds._northEast.lng.toFixed(3) * 1];
-			self.bbox = [self.bounds._southWest.lat.toFixed(3) * 1, self.bounds._northEast.lng.toFixed(3) * 1]
-			return layer;
+			drawnItems.addLayer(e.layer);
+			return e.layer;
 		});
 	}
 
-	self.drawBBOX = function(){
-		
+	self.drawBBOX = function(map, data){
+		var bounds = [data[0], data[1]];
+		// create an orange rectangle
+		L.rectangle(bounds).addTo(map);
+		// zoom the map to the rectangle bounds
+		map.fitBounds(bounds);
 	}
+
 	self.getRandomInRange = function(from, to, fixed) {
 	    return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
 	    // .toFixed() returns string, so ' * 1' is a trick to convert to number
 	}
 
-	self.operateMap = function(workermap) {
+	self.operateMap = function(workermap, bounds) {
 	    // initialize some variables
 	    var self = this;
 	    var map = workermap;

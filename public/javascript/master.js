@@ -57,13 +57,19 @@ $(document).ready(function(){
 		masterViewModel.bounds();
 		e.preventDefault();
 	});
-	masterViewModel.mapController = MapController;
-	var map = masterViewModel.mapController.initializeMap();
-	var bounds = masterViewModel.mapController.addDrawControls(map);
+
+	mapController = MapController;
+	var map = mapController.initializeMap();
+	mapController.addDrawControls(map);
 	map.on('draw:created', function (e) {
-			masterViewModel.boundingBox(masterViewModel.mapController.bbox);
-			masterViewModel.bounds([masterViewModel.mapController.southWest, masterViewModel.mapController.northEast]);
-		});
+		var bounds = e.layer.getBounds();
+		var southWest = [bounds._southWest.lat.toFixed(3) * 1, bounds._southWest.lng.toFixed(3) * 1];
+		var northEast = [bounds._northEast.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
+		var bbox = [bounds._southWest.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
+
+		masterViewModel.boundingBox(bbox);
+		masterViewModel.bounds([southWest, northEast]);
+	});
 
 	ko.applyBindings(masterViewModel);	
 })
