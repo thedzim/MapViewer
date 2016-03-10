@@ -59,7 +59,7 @@ $(document).ready(function(){
 	});
 
 	mapController = MapController;
-	var map = mapController.initializeMap();
+	var map = mapController.initializeMap("http://ows.terrestris.de/osm/service");
 	mapController.addDrawControls(map);
 	map.on('draw:created', function (e) {
 		var bounds = e.layer.getBounds();
