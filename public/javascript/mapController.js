@@ -1,13 +1,13 @@
 var MapController = new function(){
 	var self = this;
 	
-	self.initializeMap = function() {
+	self.initializeMap = function(wmsURL) {
 	    var map = L.map('map', {
 	        zoomControl: false, // Zoom control will be added further down in this function to allow for the proper ordering of controls
 	        attributionControl: false,
 	    }).setView([0,0], 3);
 
-	    var tileLayer = new L.TileLayer.WMS("http://ows.terrestris.de/osm/service", {
+	    var tileLayer = new L.TileLayer.WMS(wmsURL, {
 	        layers: "OSM-WMS",
 	        format: "image/png",
 	        transparent: true,
@@ -25,6 +25,11 @@ var MapController = new function(){
 	    // Return the map
 	    return map;
 	};
+
+	self.getCapabilities = function(url){
+		var capabilities;
+		return capabilities;
+	}
 
 	self.addDrawControls = function(map) {
 		var drawnItems = new L.FeatureGroup();
@@ -81,8 +86,17 @@ var MapController = new function(){
 	    function setNewView() {
 	        autoViewer = setInterval(function(){
 	            // generate two new latlng values within +/- 2.5 degrees of the current coords
-	            lat = self.getRandomInRange(lat -2.5, lat + 2.5, fixed);
-	            lng = self.getRandomInRange(lng -2.5, lng + 2.5, fixed);
+	            if(bounds != undefined){
+	            	// bounds is [[lat,lng], [lat, lng]]
+	            	// 0,0 is lower lat 1,0 is up upper lat
+	            	lat = self.getRandomInRange(bounds[0][0], bounds[1][0], fixed);
+	            	// 0,1 is lower lng, 1,1 is upper lng
+	            	lng = self.getRandomInRange(bounds[0][1], bounds[1][1], fixed);
+	            }else{
+	            	lat = self.getRandomInRange(lat -2.5, lat + 2.5, fixed);
+	           		lng = self.getRandomInRange(lng -2.5, lng + 2.5, fixed);
+	            }
+	            
 	            // new zoom level within the levels of 5 and 8 for easier ability to read the map
 	            zoom = Math.abs(self.getRandomInRange(5, 8, 0));
 	            map.setView({lat: lat, lon: lng}, zoom, options)

@@ -4,15 +4,17 @@ var autoViewer;
 var map;
 
 socket.on('start', function(data){
-    map = MapController.initializeMap(data);
+    map = MapController.initializeMap(data.url);
     $("#map").show();
 	toggleMessage();
 	setTimeout(function(){
 		$("#testingGIF").hide()
 	}, 3000);
     console.log(data);
-    MapController.drawBBOX(map, data.bounds);
-	MapController.operateMap(map);
+    if(data.bounds){
+       MapController.drawBBOX(map, data.bounds);       
+    }
+	MapController.operateMap(map, data.bounds);
     socket.emit("running", "running");
 });
 socket.on("stop", function(data){
