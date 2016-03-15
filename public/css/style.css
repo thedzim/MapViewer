@@ -30,22 +30,11 @@
 }
 
 .masterForm {
-    height: 6rem;
     border-radius: .25rem;
     padding-top: 2rem;
     padding-bottom: 4rem;
     margin-bottom: 3rem;
     text-align: center;
-}
-
-div.tableDiv {
-    margin: 0;
-    position: absolute;
-    padding-top: 2rem;
-    left: 50%;
-    margin-right: -50%;
-    color: white;
-    height: 10em;
 }
 
 .masterContainer {
