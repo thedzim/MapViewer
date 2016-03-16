@@ -30,7 +30,7 @@ var masterViewModel = new function() {
 	});
 	self.wmsURL.subscribe(function(newValue){
 		mapController = MapController;
-		var map = mapController.initializeMap(newValue);
+		var map = mapController.initializeMap(newValue, 2);
 		mapController.addDrawControls(map);
 		map.on('draw:created', function (e) {
 			var bounds = e.layer.getBounds();
