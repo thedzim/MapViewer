@@ -30,6 +30,9 @@ var masterViewModel = new function() {
 	});
 	self.wmsURL.subscribe(function(newValue){
 		mapController = MapController;
+		if(newValue != "http://ows.terrestris.de/osm/service"){
+			layerType = 2
+		}
 		var map = mapController.initializeMap(newValue, 2);
 		mapController.addDrawControls(map);
 		map.on('draw:created', function (e) {
