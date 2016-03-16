@@ -28,6 +28,20 @@ var masterViewModel = new function() {
 		self.averageLoadTime(avgLoadTime.toFixed(3) * 1);
 		self.numberRequests(newValue.length);
 	});
+	self.wmsURL.subscribe(function(newValue){
+		mapController = MapController;
+		var map = mapController.initializeMap(newValue);
+		mapController.addDrawControls(map);
+		map.on('draw:created', function (e) {
+			var bounds = e.layer.getBounds();
+			var southWest = [bounds._southWest.lat.toFixed(3) * 1, bounds._southWest.lng.toFixed(3) * 1];
+			var northEast = [bounds._northEast.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
+			var bbox = [bounds._southWest.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
+
+			masterViewModel.boundingBox(bbox);
+			masterViewModel.bounds([southWest, northEast]);
+		});
+	});
 };
 
 
@@ -83,18 +97,8 @@ $(document).ready(function(){
 		e.preventDefault();
 	});
 
-	mapController = MapController;
-	var map = mapController.initializeMap("http://ows.terrestris.de/osm/service", "OSM-WMS");
-	mapController.addDrawControls(map);
-	map.on('draw:created', function (e) {
-		var bounds = e.layer.getBounds();
-		var southWest = [bounds._southWest.lat.toFixed(3) * 1, bounds._southWest.lng.toFixed(3) * 1];
-		var northEast = [bounds._northEast.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
-		var bbox = [bounds._southWest.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
-
-		masterViewModel.boundingBox(bbox);
-		masterViewModel.bounds([southWest, northEast]);
-	});
+	
+	
 
 	$("#tabs").tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
 	ko.applyBindings(masterViewModel);	
