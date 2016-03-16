@@ -4,7 +4,7 @@ var autoViewer;
 var map;
 
 socket.on('start', function(data){
-    map = MapController.initializeMap(data.url);
+    map = MapController.initializeMap(data.url, data.layerType);
     $("#map").show();
 	toggleMessage();
 	setTimeout(function(){

@@ -1,14 +1,17 @@
 var MapController = new function(){
 	var self = this;
 	
-	self.initializeMap = function(wmsURL) {
+	self.initializeMap = function(wmsURL, layerType) {
 	    var map = L.map('map', {
 	        zoomControl: false, // Zoom control will be added further down in this function to allow for the proper ordering of controls
 	        attributionControl: false,
 	    }).setView([0,0], 3);
+	    if(layerType == undefined){
+	    	layerType = "OSM-WMS";
+	    }
 
 	    var tileLayer = new L.TileLayer.WMS(wmsURL, {
-	        layers: "OSM-WMS",
+	        layers: layerType,
 	        format: "image/png",
 	        transparent: true,
 	        noWrap: true,

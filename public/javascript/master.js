@@ -64,7 +64,13 @@ $(document).ready(function(){
 		var url = masterViewModel.wmsURL();
 		var bbox = masterViewModel.boundingBox();
 		var bounds = masterViewModel.bounds();
-		socket.emit("masterStart", {url: url,  bbox: bbox, bounds: bounds});
+		var layerType;
+		if(url != "http://ows.terrestris.de/osm/service"){
+			layerType = 2
+		}else{
+			layerType = "OSM-WMS";
+		}
+		socket.emit("masterStart", {url: url,  bbox: bbox, bounds: bounds, layerType: layerType});
 		toggleMessage();
 		e.preventDefault();
 	});
@@ -78,7 +84,7 @@ $(document).ready(function(){
 	});
 
 	mapController = MapController;
-	var map = mapController.initializeMap("http://ows.terrestris.de/osm/service");
+	var map = mapController.initializeMap("http://ows.terrestris.de/osm/service", "OSM-WMS");
 	mapController.addDrawControls(map);
 	map.on('draw:created', function (e) {
 		var bounds = e.layer.getBounds();
