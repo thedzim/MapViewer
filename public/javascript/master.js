@@ -3,16 +3,31 @@ var masterViewModel = new function() {
 	var self = this;
 	self.ipList = ko.observableArray();
 	// default wms to grab map tiles from
-	self.wmsURL = ko.observable("http://ows.terrestris.de/osm/service"); 
+	self.wmsURL = ko.observable(); 
 	self.boundingBox = ko.observable();
 	self.bounds = ko.observable();
-	self.mapVisibile = ko.observable(false);
-	self.tableVisible = ko.observable(true);
+	self.metrics = ko.observableArray();
+	self.averageLoadTime = ko.observable();
+	self.minLoadTime = ko.observable();
+	self.maxLoadTime = ko.observable();
+	self.numberRequests = ko.observable();
 
-	self.toggleMap = function(){
-		self.mapVisibile(!self.mapVisibile());
-		self.tableVisible(!self.tableVisible());
-	}
+	// compute and update metrics
+	self.metrics.subscribe(function(newValue){
+		var sum = 0;
+		ko.utils.arrayFirst(newValue, function(item){
+			sum += item;
+			if(self.minLoadTime() == undefined || item < self.minLoadTime()){
+				self.minLoadTime(item);
+			}
+			if(self.maxLoadTime() == undefined || item > self.maxLoadTime()){
+				self.maxLoadTime(item);
+			}
+		});
+		var avgLoadTime = sum / newValue.length;
+		self.averageLoadTime(avgLoadTime.toFixed(3) * 1);
+		self.numberRequests(newValue.length);
+	});
 };
 
 
@@ -32,13 +47,17 @@ socket.on("socketRunning", function(data){
 	    }
 	});
 });
+socket.on('metrics', function(data){
+	if(data != null){
+		masterViewModel.metrics.push(data);
+	}
+});
 
 
 function toggleMessage(){
-	$("#masterForm").toggle();
-	$("#testingMessage").toggle();
+	$(".testingStart").toggle();
+	$(".testingMessage").toggle();
 }
-
 
 $(document).ready(function(){
 	$("#start").on("click", function(e){
@@ -71,5 +90,6 @@ $(document).ready(function(){
 		masterViewModel.bounds([southWest, northEast]);
 	});
 
+	$("#tabs").tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
 	ko.applyBindings(masterViewModel);	
 })

@@ -15,7 +15,7 @@ var MapController = new function(){
 	        tms: false
 	    }).addTo(map);
 
-	    tileLayer.on("load", function(){ console.log("everything is loaded")});
+	    self.collectMetrics(tileLayer);
 	    
 	    // Add a scale control
 	    L.control.scale({ position: 'bottomleft' }).addTo(map);
@@ -60,6 +60,23 @@ var MapController = new function(){
 		L.rectangle(bounds).addTo(map);
 		// zoom the map to the rectangle bounds
 		map.fitBounds(bounds);
+	}
+
+	self.collectMetrics = function(tileLayer){
+		var timer = function(){
+			return Date.now();
+		}
+		var start, stop, diff;
+		tileLayer.on("loading", function(){
+			start = timer();
+			console.log("loading started...")
+		});
+	    tileLayer.on("load", function(){ 
+	    	stop = timer();
+	    	diff = stop - start
+	    	console.log("everything loaded in: " + diff + "ms");
+	    	socket.emit("metrics", diff);
+	    });
 	}
 
 	self.getRandomInRange = function(from, to, fixed) {

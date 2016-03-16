@@ -44,6 +44,9 @@ module.exports.listen = function(app){
 	  	socket.on('running', function(data){
 			broadcast(master, "socketRunning", {socketid: socket.id, message: "running"});
 		});
+		socket.on('metrics', function(data){
+			broadcast(master, "metrics", data);
+		});
 	};
 
 	function masterConnection(socket) {

@@ -12,7 +12,7 @@
     text-align: center;
 }
 
-.testing {
+.testing, .testingMessage {
 	display: none;
 }
 
@@ -45,5 +45,4 @@
 
 .tableContainer {
     display: block;
-    color: red;
 }

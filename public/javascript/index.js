@@ -29,5 +29,3 @@ function toggleMessage() {
     $("#waitingMessage").toggle();
     $("#testingMessage").toggle();
 }
-
-

@@ -1,61 +1,88 @@
-<script src="/socket.io/socket.io.js"></script>
-<script src="/libs/jquery.js"></script>
-<script src="/libs/knockout.js"></script>
-<script src="/javascript/master.js"></script>
-<script src="/javascript/mapController.js"></script>
-<script type="text/javascript" src='/libs/leaflet.js'></script>
-<script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
-<link rel="stylesheet" type="text/css" href="/css/style.css"></link>
-<link rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
-<link rel="stylesheet" type="text/css" href="/css/leaflet.css"></link>
-<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.draw/leaflet.draw.css"></link>
-
-<div class="row">
-	<div class="container-fluid masterContainer">
-		<form role="form" data-toggle="validator" class="masterForm" id="masterForm">
-		  <div class="form-group">
-		    <label for="url">WMS URL</label>
-		    <input type="url" data-bind="value: wmsURL" placeholder="ex: http://ows.terrestris.de/osm/service" class="form-control" id="url" required>
-		  </div>
-		  <div class="form-group">
-		    <label for="bbox">Bounding box:</label>
-		    <input type="text" data-bind="value: boundingBox" placeholder="38.65, -76.67" class="form-control" id="bbox">
-		    <span class="icon-globe icon-white" data-bind="click: toggleMap"></span>
-		    <div class="center" id="map" data-bind="visible: mapVisibile"></div>
-		  </div>
-		  <button id="start" class="btn btn-primary">Start Tests</button>
-		</form>
-		<div id="testingMessage" class="testing hidden">
-			<h1>Test in Progress</h1>
-			<button id="stop" class="btn btn-primary">Stop Tests</button>
+<html lang="en">
+	<head>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/libs/jquery.js"></script>
+		<script src="/libs/knockout.js"></script>
+		<script src="/libs/validator.js"></script>
+		<script src="/javascript/master.js"></script>
+		<script src="/javascript/mapController.js"></script>
+		<script src="/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src='/libs/leaflet.js'></script>
+		<script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
+		<link rel="stylesheet" type="text/css" href="/css/style.css"></link>
+		<link rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
+		<link rel="stylesheet" type="text/css" href="/css/leaflet.css"></link>
+		<link rel="stylesheet" type="text/css" href="/css/jquery-ui.css"></link>
+		<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.draw/leaflet.draw.css"></link>
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="masterContainer">
+					<form role="form" data-toggle="validator" class="masterForm testingStart" id="masterForm">
+					  <div class="form-group col-md-6">
+					    <label for="url" class="control-label">WMS URL</label>
+					    <input type="url" data-bind="value: wmsURL" placeholder="ex: http://ows.terrestris.de/osm/service" class="form-control" id="url" required>
+					  </div>
+					  <div class="form-group col-md-6">
+					    <label for="bbox">Bounding box:</label>
+					    <input type="text" data-bind="value: boundingBox" placeholder="38.65, -76.67" class="form-control" id="bbox">
+					  </div>
+					  <button id="start" class="btn btn-primary">Start Tests</button>
+					</form>
+					<div id="testingMessage" class="testingMessage">
+						<h1>Test in Progress</h1>
+						<button id="stop" class="btn btn-primary">Stop Tests</button>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div id="tabs">
+					<ul>
+						<li><a href="#stats">Stats</a></li>
+						<li><a href="#connections">Connections</a></li>
+						<li><a href="#map">Map</a></li>
+					</ul>
+					<div id="stats">
+						<div class="container">
+							<div class="row">
+								<div class="col-md-4">Average Load Time (ms): </div>
+								<div class="col-md-4" data-bind="text: averageLoadTime"></div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">Minimum Load Time (ms): </div>
+								<div class="col-md-4" data-bind="text: minLoadTime"></div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">Maximum Load Time (ms): </div>
+								<div class="col-md-4" data-bind="text: maxLoadTime"></div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">Number Requests: </div>
+								<div class="col-md-4" data-bind="text: numberRequests"></div>
+							</div>
+						</div>
+						
+					</div>
+					<div id="connections">
+						<div class="row">
+							<div class="container-fluid tableContainer">
+								<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}"></div>
+							</div>
+						</div>
+					</div>
+					<div id="map" class="center"></div>
+				</div>
+			</div>
 		</div>
-	</div>
-</div>
-<div class="row">
-	<div class="row">
-		<div class="container-fluid tableContainer">
-			<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}, visible: tableVisible"></div>
-		</div>
-	</div>
-</div>
 
-<script type="text/html" id="ip-table-template">
-	<table class="table table-striped">
-		<thead>
-			<tr>
-				<th>#</th>
-				<th>Connected IP</th>
-			</tr>
-		</thead>
-		<tbody data-bind="foreach: {data: ipList}">
-			<tr>
-				<td>
-					<span data-bind="text: $index"></span>
-				</td>
-				<td>
-					<span data-bind="text: $data.address"></span>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</script>
+		<script type="text/html" id="ip-table-template">
+			Connected IP
+			<div id="accordion" data-bind="foreach: {data: ipList}">
+				<h3 data-bind="text: $data.address"></h3>
+				<div>
+				</div>
+			</div>
+		</script>
+	</body>
+</html>
