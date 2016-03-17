@@ -1,7 +1,6 @@
 //create app
 var app = require('http').createServer(handler);
-var static = require('node-static');
-var file = new(static.Server)();
+var url = require('url');
 // socket
 // var io = require('socket.io');
 // file system
@@ -23,6 +22,7 @@ function handler (req, res) {
 	var requestedPath = '/public/';
 	var urlPath = path.parse(req.url);
 	var contentType = '';
+
 	switch(urlPath.dir){
 		case '/':
 			switch(urlPath.base){
@@ -51,9 +51,17 @@ function handler (req, res) {
 			contentType = "application/javascript"
 			break;
 		case '/css' : 
-			requestedPath += 'css/' + urlPath.base
-			contentType = "text/css"
-			break;
+			switch(urlPath.base){
+				case "spritesheet.png" : 
+					requestedPath += 'css/images/' + urlPath.base
+					contentType = "image/png"
+					break;
+				default:
+					requestedPath += 'css/' + urlPath.base
+					contentType = "text/css"
+					break;
+				}
+				break;
 		case '/img' :
 			requestedPath += 'img/' + urlPath.base
 			contentType = "image/png"
@@ -65,7 +73,7 @@ function handler (req, res) {
 	function (err, data) {
 		if (err) {
   			res.writeHead(500);
-  			return res.end('Internal Server Error. Cannot process request.');
+  			return res.end('Internal Server Error. Cannot process request. ' + err);
 		}
 		res.writeHead(200, {"Content-length" : data.length, "content-type" : contentType});
 		res.end(data);
