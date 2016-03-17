@@ -84,16 +84,6 @@ module.exports.listen = function(app){
 	return io;
 }
 
-/**
-* event list
-* worker connect
-* worker disconnect
-* push results
-*
-* master start
-* master stop
-* master request workers
-**/
 
 
 
