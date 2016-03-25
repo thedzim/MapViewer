@@ -1,12 +1,12 @@
 var socket = io('/master');
 var masterViewModel = new function() {
 	var self = this;
+	self.map = ko.observable();
 	self.ipList = ko.observableArray();
 	// default wms to grab map tiles from
 	self.wmsURL = ko.observable();
 	self.availableLayers = ko.observableArray();
 	self.selectedLayers = ko.observableArray();
-	self.boundingBox = ko.observable();
 	self.bounds = ko.observable();
 	self.metrics = ko.observableArray();
 	self.averageLoadTime = ko.observable();
@@ -30,9 +30,16 @@ var masterViewModel = new function() {
 		self.averageLoadTime(avgLoadTime.toFixed(3) * 1);
 		self.numberRequests(newValue.length);
 	});
+
+	self.bounds.subscribe(function(newValue){
+		if(typeof newValue == "string"){
+			var splitValues = newValue.split(",").map(Number);
+			self.bounds([[ splitValues[0] , splitValues[1] ] , [ splitValues[2] , splitValues[3] ]]);
+			mapController.drawBBOX(self.map, self.bounds())
+		}
+	});
 	
 };
-
 
 socket.on('news', function (data) {
 	console.log(data);
@@ -64,7 +71,8 @@ function toggleMessage(){
 
 function capabilitesClickHandler(){
 	$("#getCapabilities").on("click", function(e){
-		var map = mapController.initializeMap(masterViewModel.wmsURL(), masterViewModel.selectedLayers());
+		masterViewModel.map = mapController.initializeMap(masterViewModel.wmsURL(), masterViewModel.selectedLayers());
+		var map = masterViewModel.map;
 		mapController.addDrawControls(map);
 		map.on('draw:created', function (e) {
 			var bounds = e.layer.getBounds();
@@ -72,7 +80,6 @@ function capabilitesClickHandler(){
 			var northEast = [bounds._northEast.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
 			var bbox = [bounds._southWest.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
 
-			masterViewModel.boundingBox(bbox);
 			masterViewModel.bounds([southWest, northEast]);
 		});
 		$('#capabilityModal').modal('hide');
@@ -104,10 +111,9 @@ $(document).ready(function(){
 	
 	$("#start").on("click", function(e){
 		var url = masterViewModel.wmsURL();
-		var bbox = masterViewModel.boundingBox();
 		var bounds = masterViewModel.bounds();
 		var layerType = masterViewModel.selectedLayers();
-		socket.emit("masterStart", {url: url,  bbox: bbox, bounds: bounds, layerType: layerType});
+		socket.emit("masterStart", {url: url, bounds: bounds, layerType: layerType});
 		toggleMessage();
 		e.preventDefault();
 	});
@@ -116,7 +122,6 @@ $(document).ready(function(){
 		socket.emit("masterStop", "stop");
 		toggleMessage();
 		masterViewModel.wmsURL();
-		masterViewModel.boundingBox();
 		masterViewModel.bounds();
 		e.preventDefault();
 	});
