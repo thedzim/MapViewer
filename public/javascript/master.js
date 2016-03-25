@@ -3,7 +3,9 @@ var masterViewModel = new function() {
 	var self = this;
 	self.ipList = ko.observableArray();
 	// default wms to grab map tiles from
-	self.wmsURL = ko.observable(); 
+	self.wmsURL = ko.observable();
+	self.availableLayers = ko.observableArray();
+	self.selectedLayers = ko.observableArray();
 	self.boundingBox = ko.observable();
 	self.bounds = ko.observable();
 	self.metrics = ko.observableArray();
@@ -60,15 +62,9 @@ function toggleMessage(){
 	$(".testingMessage").toggle();
 }
 
-$(document).ready(function(){
-	masterViewModel.wmsURL.subscribe(function(newValue){
-		mapController = MapController;
-		if(newValue != "http://ows.terrestris.de/osm/service"){
-			layerType = 2
-		}else{
-			layerType = "OSM-WMS"
-		}
-		var map = mapController.initializeMap(newValue, layerType);
+function capabilitesClickHandler(){
+	$("#getCapabilities").on("click", function(e){
+		var map = mapController.initializeMap(masterViewModel.wmsURL(), masterViewModel.selectedLayers());
 		mapController.addDrawControls(map);
 		map.on('draw:created', function (e) {
 			var bounds = e.layer.getBounds();
@@ -79,21 +75,43 @@ $(document).ready(function(){
 			masterViewModel.boundingBox(bbox);
 			masterViewModel.bounds([southWest, northEast]);
 		});
+		$('#capabilityModal').modal('hide');
 	});
+}
+
+$(document).ready(function(){
+	masterViewModel.wmsURL.subscribe(function(newValue){
+		mapController = MapController;
+		$('#capabilityModal').modal('show') 
+		mapController.getCapabilities(masterViewModel.wmsURL(), {
+			success : function(data){
+				masterViewModel.availableLayers(data);
+				$('#capabilitiesSelect').multiSelect({
+					afterSelect: function(layer){
+				 		masterViewModel.selectedLayers.push(layer[0]);
+					},
+					afterDeselect: function(layer){
+						masterViewModel.selectedLayers.remove(layer[0]);
+					}
+				});
+				capabilitesClickHandler();
+			},
+			error: function(error){
+				console.log(error);
+			}
+		});
+	});
+	
 	$("#start").on("click", function(e){
 		var url = masterViewModel.wmsURL();
 		var bbox = masterViewModel.boundingBox();
 		var bounds = masterViewModel.bounds();
-		var layerType;
-		if(url != "http://ows.terrestris.de/osm/service"){
-			layerType = 2
-		}else{
-			layerType = "OSM-WMS";
-		}
+		var layerType = masterViewModel.selectedLayers();
 		socket.emit("masterStart", {url: url,  bbox: bbox, bounds: bounds, layerType: layerType});
 		toggleMessage();
 		e.preventDefault();
 	});
+
 	$("#stop").on("click", function(e){
 		socket.emit("masterStop", "stop");
 		toggleMessage();
@@ -102,9 +120,6 @@ $(document).ready(function(){
 		masterViewModel.bounds();
 		e.preventDefault();
 	});
-
-	
-	
 
 	$("#tabs").tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
 	ko.applyBindings(masterViewModel);	

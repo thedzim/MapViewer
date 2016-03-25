@@ -7,15 +7,19 @@
 		<script src="/javascript/master.js"></script>
 		<script src="/javascript/mapController.js"></script>
 		<script src="/javascript/jquery-ui.js"></script>
-		<script type="text/javascript" src='/libs/leaflet.js'></script>
+		<script src="/javascript/bootstrap.min.js"></script>
+		<script src="/javascript/jquery.multi-select.js"></script>
+		<script src='/libs/leaflet.js'></script>
 		<script src="/libs/leaflet.draw.js"></script>
 		<link rel="stylesheet" type="text/css" href="/css/style.css"></link>
 		<link rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
 		<link rel="stylesheet" type="text/css" href="/css/leaflet.css"></link>
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui.css"></link>
 		<link rel="stylesheet" href="/css/leaflet.draw.css"></link>
+		<link rel="stylesheet" type="text/css" href="/css/multi-select.css"></link>
 	</head>
 	<body>
+		<div data-bind="template: {name: 'capability-modal-template'}"></div>
 		<div class="container-fluid">
 			<div class="row">
 				<div class="masterContainer">
@@ -82,6 +86,27 @@
 				<h3 data-bind="text: $data.address"></h3>
 				<div>
 				</div>
+			</div>
+		</script>
+		<script type="text/html" id="capability-modal-template">
+			<div class="modal fade" id="capabilityModal" tabindex="-1" role="dialog">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title">Available Layers</h4>
+			      </div>
+			      <div class="modal-body">
+			      	<select multiple="multiple" id="capabilitiesSelect" data-bind="foreach: {data: availableLayers}">
+						<option data-bind="text: $data.textContent, value: $data.textContent"></option>
+					</select>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="button" id="getCapabilities" class="btn btn-primary">Get Layers</button>
+			      </div>
+			    </div>
+			  </div>
 			</div>
 		</script>
 	</body>
