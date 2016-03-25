@@ -68,6 +68,9 @@ module.exports.listen = function(app){
 		socket.on('masterStop', function (data) {
 			broadcast(worker, "stop", data);
 		});
+		socket.on("refreshConnections", function(){
+			broadcast(master, "workerConnected", self.connections);
+		});
 		
 	};
 

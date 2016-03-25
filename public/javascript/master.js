@@ -122,5 +122,8 @@ $(document).ready(function(){
 	});
 
 	$("#tabs").tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+	$("#refreshConnections").on("click", function(e){
+		socket.emit("refreshConnections")
+	});
 	ko.applyBindings(masterViewModel);	
 })

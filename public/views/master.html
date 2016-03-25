@@ -71,7 +71,15 @@
 					<div id="connections">
 						<div class="row">
 							<div class="container-fluid tableContainer">
-								<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}"></div>
+								<div class="tableDiv">
+									<h3>Connected IP</h3>
+									<button class="btn btn-primary" id="refreshConnections">Refresh List</button>
+									<div id="accordion" data-bind="foreach: {data: ipList}">
+										<h3 data-bind="text: $data.address"></h3>
+										<div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -79,15 +87,6 @@
 				</div>
 			</div>
 		</div>
-
-		<script type="text/html" id="ip-table-template">
-			Connected IP
-			<div id="accordion" data-bind="foreach: {data: ipList}">
-				<h3 data-bind="text: $data.address"></h3>
-				<div>
-				</div>
-			</div>
-		</script>
 		<script type="text/html" id="capability-modal-template">
 			<div class="modal fade" id="capabilityModal" tabindex="-1" role="dialog">
 			  <div class="modal-dialog">
