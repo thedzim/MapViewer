@@ -1,13 +1,9 @@
 //create app
 var app = require('http').createServer(handler);
-var url = require('url');
-// socket
-// var io = require('socket.io');
 // file system
 var fs = require('fs');
 // path
 var path = require('path');
-
 // socket controller
 var socketController = require('./socketController').listen(app);
 
