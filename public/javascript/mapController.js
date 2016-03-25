@@ -46,7 +46,7 @@ var MapController = new function(){
 						if(window.chrome){
 							supportedLayers = data.getElementsByTagName("Name");
 						}else{
-							supportedLayers = $(data).find("gml\\:Name");
+							supportedLayers = $(data).find("Name");
 						}
 					}
 					if(callback != null){
@@ -146,8 +146,8 @@ var MapController = new function(){
 	            }
 	            
 	            // new zoom level within the levels of 5 and 8 for easier ability to read the map
-	            zoom = Math.abs(self.getRandomInRange(5, 8, 0));
-	            map.setView({lat: lat, lon: lng}, zoom, options)
+	            newZoom = Math.abs(self.getRandomInRange(zoom -4, zoom + 5, 0));
+	            map.setView({lat: lat, lon: lng}, newZoom, options)
 	        }, 4000);
 	    };
 
