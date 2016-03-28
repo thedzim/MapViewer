@@ -1,10 +1,11 @@
 
 var socket = io('/worker');
-var autoViewer;
 var map;
 
 socket.on('start', function(data){
-    map = MapController.initializeMap(data.url, data.layerType);
+    if(map == undefined){
+         map = MapController.initializeMap(data.url, data.layerType);
+    }
     $("#map").show();
 	toggleMessage();
 	setTimeout(function(){
@@ -17,8 +18,7 @@ socket.on('start', function(data){
     socket.emit("running", "running");
 });
 socket.on("stop", function(data){
-    clearInterval(autoViewer);
-    map.remove();
+    clearInterval(autoViewer);    
     $("#map").hide();
     socket.emit("stopped", "stopped");
     toggleMessage();

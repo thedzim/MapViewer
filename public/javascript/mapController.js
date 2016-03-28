@@ -2,7 +2,7 @@ var MapController = new function(){
 	var self = this;
 	
 	self.initializeMap = function(wmsURL, layerType) {
-	    var map = L.map('map', {
+	    var map = new L.map('map', {
 	        zoomControl: false, // Zoom control will be added further down in this function to allow for the proper ordering of controls
 	        attributionControl: false,
 	    }).setView([0,0], 3);
