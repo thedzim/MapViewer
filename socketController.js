@@ -68,6 +68,9 @@ module.exports.listen = function(app){
 		socket.on('masterStop', function (data) {
 			broadcast(worker, "stop", data);
 		});
+		socket.on("refreshConnections", function(){
+			broadcast(master, "workerConnected", self.connections);
+		});
 		
 	};
 
@@ -84,16 +87,6 @@ module.exports.listen = function(app){
 	return io;
 }
 
-/**
-* event list
-* worker connect
-* worker disconnect
-* push results
-*
-* master start
-* master stop
-* master request workers
-**/
 
 
 

@@ -1,10 +1,12 @@
 var socket = io('/master');
 var masterViewModel = new function() {
 	var self = this;
+	self.map = ko.observable();
 	self.ipList = ko.observableArray();
 	// default wms to grab map tiles from
-	self.wmsURL = ko.observable(); 
-	self.boundingBox = ko.observable();
+	self.wmsURL = ko.observable();
+	self.availableLayers = ko.observableArray();
+	self.selectedLayers = ko.observableArray();
 	self.bounds = ko.observable();
 	self.metrics = ko.observableArray();
 	self.averageLoadTime = ko.observable();
@@ -28,8 +30,16 @@ var masterViewModel = new function() {
 		self.averageLoadTime(avgLoadTime.toFixed(3) * 1);
 		self.numberRequests(newValue.length);
 	});
-};
 
+	self.bounds.subscribe(function(newValue){
+		if(typeof newValue == "string"){
+			var splitValues = newValue.split(",").map(Number);
+			self.bounds([[ splitValues[0] , splitValues[1] ] , [ splitValues[2] , splitValues[3] ]]);
+			mapController.drawBBOX(self.map, self.bounds())
+		}
+	});
+	
+};
 
 socket.on('news', function (data) {
 	console.log(data);
@@ -59,43 +69,71 @@ function toggleMessage(){
 	$(".testingMessage").toggle();
 }
 
-$(document).ready(function(){
+function capabilitesClickHandler(){
+	$("#getCapabilities").on("click", function(e){
+		masterViewModel.map = mapController.initializeMap(masterViewModel.wmsURL(), masterViewModel.selectedLayers());
+		var map = masterViewModel.map;
+		mapController.addDrawControls(map);
+		map.on('draw:created', function (e) {
+			var bounds = e.layer.getBounds();
+			var southWest = [bounds._southWest.lat.toFixed(3) * 1, bounds._southWest.lng.toFixed(3) * 1];
+			var northEast = [bounds._northEast.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
+			var bbox = [bounds._southWest.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
+
+			masterViewModel.bounds([southWest, northEast]);
+		});
+		$('#capabilityModal').modal('hide');
+	});
+}
+
+var buttonClickHandlers = function(){
 	$("#start").on("click", function(e){
 		var url = masterViewModel.wmsURL();
-		var bbox = masterViewModel.boundingBox();
 		var bounds = masterViewModel.bounds();
-		var layerType;
-		if(url != "http://ows.terrestris.de/osm/service"){
-			layerType = 2
-		}else{
-			layerType = "OSM-WMS";
-		}
-		socket.emit("masterStart", {url: url,  bbox: bbox, bounds: bounds, layerType: layerType});
+		var layerType = masterViewModel.selectedLayers();
+		socket.emit("masterStart", {url: url, bounds: bounds, layerType: layerType});
 		toggleMessage();
 		e.preventDefault();
 	});
+
 	$("#stop").on("click", function(e){
 		socket.emit("masterStop", "stop");
 		toggleMessage();
 		masterViewModel.wmsURL();
-		masterViewModel.boundingBox();
 		masterViewModel.bounds();
 		e.preventDefault();
 	});
-
-	mapController = MapController;
-	var map = mapController.initializeMap("http://ows.terrestris.de/osm/service", "OSM-WMS");
-	mapController.addDrawControls(map);
-	map.on('draw:created', function (e) {
-		var bounds = e.layer.getBounds();
-		var southWest = [bounds._southWest.lat.toFixed(3) * 1, bounds._southWest.lng.toFixed(3) * 1];
-		var northEast = [bounds._northEast.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
-		var bbox = [bounds._southWest.lat.toFixed(3) * 1, bounds._northEast.lng.toFixed(3) * 1];
-
-		masterViewModel.boundingBox(bbox);
-		masterViewModel.bounds([southWest, northEast]);
+	
+	$("#refreshConnections").on("click", function(e){
+		socket.emit("refreshConnections")
 	});
 
+}
+
+$(document).ready(function(){
+	masterViewModel.wmsURL.subscribe(function(newValue){
+		mapController = MapController;
+		$('#capabilityModal').modal('show') 
+		mapController.getCapabilities(masterViewModel.wmsURL(), {
+			success : function(data){
+				masterViewModel.availableLayers(data);
+				$('#capabilitiesSelect').multiSelect({
+					afterSelect: function(layer){
+				 		masterViewModel.selectedLayers.push(layer[0]);
+					},
+					afterDeselect: function(layer){
+						masterViewModel.selectedLayers.remove(layer[0]);
+					}
+				});
+				capabilitesClickHandler();
+			},
+			error: function(error){
+				console.log(error);
+			}
+		});
+	});
+	
 	$("#tabs").tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+	buttonClickHandlers();
 	ko.applyBindings(masterViewModel);	
 })

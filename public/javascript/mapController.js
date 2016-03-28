@@ -2,16 +2,17 @@ var MapController = new function(){
 	var self = this;
 	
 	self.initializeMap = function(wmsURL, layerType) {
-	    var map = L.map('map', {
+	    var map = new L.map('map', {
 	        zoomControl: false, // Zoom control will be added further down in this function to allow for the proper ordering of controls
 	        attributionControl: false,
 	    }).setView([0,0], 3);
+
 	    if(layerType == undefined){
 	    	layerType = "OSM-WMS";
 	    }
 
 	    var tileLayer = new L.TileLayer.WMS(wmsURL, {
-	        layers: layerType,
+	        layers: layerType.join(),
 	        format: "image/png",
 	        transparent: true,
 	        noWrap: true,
@@ -29,10 +30,37 @@ var MapController = new function(){
 	    return map;
 	};
 
-	self.getCapabilities = function(url){
-		var capabilities;
-		return capabilities;
-	}
+	self.getCapabilities = function(url, callback) {
+		var self = this;
+		if(url){
+			// Query the server with the GetCapabilities request
+			$.ajax({
+				url: url + '/?service=WMS&request=GetCapabilities',
+				type: "GET",
+				dataType: "xml",
+				cache: true,
+				success: function(data) {
+					var offeredLayers = [];
+					if(data.hasChildNodes('Layers')){
+						// namespaces breaks if they aren't included in ff, but break chrome if they are. the switch on browser type is so that it works
+						if(window.chrome){
+							supportedLayers = data.getElementsByTagName("Name");
+						}else{
+							supportedLayers = $(data).find("Name");
+						}
+					}
+					if(callback != null){
+						callback.success(supportedLayers, data);
+					}
+				},
+				error: function(request, error, exception) {
+					if (callback !== null) {
+						callback.error(exception);
+					}
+				}
+			});
+		}
+	};
 
 	self.addDrawControls = function(map) {
 		var drawnItems = new L.FeatureGroup();
@@ -118,8 +146,8 @@ var MapController = new function(){
 	            }
 	            
 	            // new zoom level within the levels of 5 and 8 for easier ability to read the map
-	            zoom = Math.abs(self.getRandomInRange(5, 8, 0));
-	            map.setView({lat: lat, lon: lng}, zoom, options)
+	            newZoom = Math.abs(self.getRandomInRange(zoom -4, zoom + 5, 0));
+	            map.setView({lat: lat, lon: lng}, newZoom, options)
 	        }, 4000);
 	    };
 

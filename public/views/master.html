@@ -7,15 +7,19 @@
 		<script src="/javascript/master.js"></script>
 		<script src="/javascript/mapController.js"></script>
 		<script src="/javascript/jquery-ui.js"></script>
-		<script type="text/javascript" src='/libs/leaflet.js'></script>
-		<script src="http://leaflet.github.io/Leaflet.draw/leaflet.draw.js"></script>
+		<script src="/javascript/bootstrap.min.js"></script>
+		<script src="/javascript/jquery.multi-select.js"></script>
+		<script src='/libs/leaflet.js'></script>
+		<script src="/libs/leaflet.draw.js"></script>
 		<link rel="stylesheet" type="text/css" href="/css/style.css"></link>
 		<link rel="stylesheet" type="text/css" href="/css/bootstrap.css"></link>
 		<link rel="stylesheet" type="text/css" href="/css/leaflet.css"></link>
 		<link rel="stylesheet" type="text/css" href="/css/jquery-ui.css"></link>
-		<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.draw/leaflet.draw.css"></link>
+		<link rel="stylesheet" href="/css/leaflet.draw.css"></link>
+		<link rel="stylesheet" type="text/css" href="/css/multi-select.css"></link>
 	</head>
 	<body>
+		<div data-bind="template: {name: 'capability-modal-template'}"></div>
 		<div class="container-fluid">
 			<div class="row">
 				<div class="masterContainer">
@@ -26,7 +30,7 @@
 					  </div>
 					  <div class="form-group col-md-6">
 					    <label for="bbox">Bounding box:</label>
-					    <input type="text" data-bind="value: boundingBox" placeholder="38.65, -76.67" class="form-control" id="bbox">
+					    <input type="text" data-bind="value: bounds" placeholder="33.772,68.005,35.274,70.62" class="form-control" id="bbox">
 					  </div>
 					  <button id="start" class="btn btn-primary">Start Tests</button>
 					</form>
@@ -39,9 +43,9 @@
 			<div class="row">
 				<div id="tabs">
 					<ul>
+						<li><a href="#map">Map</a></li>
 						<li><a href="#stats">Stats</a></li>
 						<li><a href="#connections">Connections</a></li>
-						<li><a href="#map">Map</a></li>
 					</ul>
 					<div id="stats">
 						<div class="container">
@@ -67,7 +71,15 @@
 					<div id="connections">
 						<div class="row">
 							<div class="container-fluid tableContainer">
-								<div class="tableDiv" data-bind="template: {name: 'ip-table-template'}"></div>
+								<div class="tableDiv">
+									<h3>Connected IP</h3>
+									<button class="btn btn-primary" id="refreshConnections">Refresh List</button>
+									<div id="accordion" data-bind="foreach: {data: ipList}">
+										<h3 data-bind="text: $data.address"></h3>
+										<div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -75,13 +87,25 @@
 				</div>
 			</div>
 		</div>
-
-		<script type="text/html" id="ip-table-template">
-			Connected IP
-			<div id="accordion" data-bind="foreach: {data: ipList}">
-				<h3 data-bind="text: $data.address"></h3>
-				<div>
-				</div>
+		<script type="text/html" id="capability-modal-template">
+			<div class="modal fade" id="capabilityModal" tabindex="-1" role="dialog">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title">Available Layers</h4>
+			      </div>
+			      <div class="modal-body">
+			      	<select multiple="multiple" id="capabilitiesSelect" data-bind="foreach: {data: availableLayers}">
+						<option data-bind="text: $data.textContent, value: $data.textContent"></option>
+					</select>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="button" id="getCapabilities" class="btn btn-primary">Get Layers</button>
+			      </div>
+			    </div>
+			  </div>
 			</div>
 		</script>
 	</body>
