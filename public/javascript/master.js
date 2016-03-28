@@ -86,6 +86,30 @@ function capabilitesClickHandler(){
 	});
 }
 
+var buttonClickHandlers = function(){
+	$("#start").on("click", function(e){
+		var url = masterViewModel.wmsURL();
+		var bounds = masterViewModel.bounds();
+		var layerType = masterViewModel.selectedLayers();
+		socket.emit("masterStart", {url: url, bounds: bounds, layerType: layerType});
+		toggleMessage();
+		e.preventDefault();
+	});
+
+	$("#stop").on("click", function(e){
+		socket.emit("masterStop", "stop");
+		toggleMessage();
+		masterViewModel.wmsURL();
+		masterViewModel.bounds();
+		e.preventDefault();
+	});
+	
+	$("#refreshConnections").on("click", function(e){
+		socket.emit("refreshConnections")
+	});
+
+}
+
 $(document).ready(function(){
 	masterViewModel.wmsURL.subscribe(function(newValue){
 		mapController = MapController;
@@ -109,26 +133,7 @@ $(document).ready(function(){
 		});
 	});
 	
-	$("#start").on("click", function(e){
-		var url = masterViewModel.wmsURL();
-		var bounds = masterViewModel.bounds();
-		var layerType = masterViewModel.selectedLayers();
-		socket.emit("masterStart", {url: url, bounds: bounds, layerType: layerType});
-		toggleMessage();
-		e.preventDefault();
-	});
-
-	$("#stop").on("click", function(e){
-		socket.emit("masterStop", "stop");
-		toggleMessage();
-		masterViewModel.wmsURL();
-		masterViewModel.bounds();
-		e.preventDefault();
-	});
-
 	$("#tabs").tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
-	$("#refreshConnections").on("click", function(e){
-		socket.emit("refreshConnections")
-	});
+	buttonClickHandlers();
 	ko.applyBindings(masterViewModel);	
 })
