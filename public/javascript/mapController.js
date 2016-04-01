@@ -2,6 +2,7 @@ var MapController = new function(){
 	var self = this;
 	self.map;
 	self.tileLayer;
+	self.stopped = true;
 	
 	self.initializeMap = function(wmsURL, layerType) {
 	    self.map = new L.map('map', {
@@ -159,7 +160,9 @@ var MapController = new function(){
 
 		self.tileLayer.on("load", function(){
 		    autoViewer = setTimeout(function(){
-		    	setNewView();
+		    	if(!self.stopped){
+		    		setNewView();
+		    	}
 		    }, 4000);
 		});	    
 	};	

@@ -18,7 +18,7 @@ socket.on('start', function(data){
     socket.emit("running", "running");
 });
 socket.on("stop", function(data){
-    clearInterval(autoViewer);
+    clearTimeout(autoViewer);
     $("#map").hide();
     socket.emit("stopped", "stopped");
     toggleMessage();
@@ -27,4 +27,5 @@ socket.on("stop", function(data){
 function toggleMessage() {
     $("#waitingMessage").toggle();
     $("#testingMessage").toggle();
+    MapController.stopped = !MapController.stopped;
 }
