@@ -1,8 +1,10 @@
 var MapController = new function(){
 	var self = this;
+	self.map;
+	self.tileLayer;
 	
 	self.initializeMap = function(wmsURL, layerType) {
-	    var map = new L.map('map', {
+	    self.map = new L.map('map', {
 	        zoomControl: false, // Zoom control will be added further down in this function to allow for the proper ordering of controls
 	        attributionControl: false,
 	    }).setView([0,0], 3);
@@ -17,17 +19,17 @@ var MapController = new function(){
 	        transparent: true,
 	        noWrap: true,
 	        tms: false
-	    }).addTo(map);
-
+	    }).addTo(self.map);
+	    self.tileLayer = tileLayer;
 	    self.collectMetrics(tileLayer);
 	    
 	    // Add a scale control
-	    L.control.scale({ position: 'bottomleft' }).addTo(map);
+	    L.control.scale({ position: 'bottomleft' }).addTo(self.map);
 	    var zoomControl = new L.control.zoom({ position: 'topleft' });
-	    map.addControl(zoomControl);
+	    self.map.addControl(zoomControl);
 	    
 	    // Return the map
-	    return map;
+	    return self.map;
 	};
 
 	self.getCapabilities = function(url, callback) {
@@ -87,8 +89,10 @@ var MapController = new function(){
 
 	self.drawBBOX = function(map, data){
 		var bounds = [data[0], data[1]];
+		var drawnItems = new L.FeatureGroup();
+		map.addLayer(drawnItems);
 		// create an orange rectangle
-		L.rectangle(bounds).addTo(map);
+		drawnItems.addLayer(L.rectangle(bounds));
 		// zoom the map to the rectangle bounds
 		map.fitBounds(bounds);
 	}
@@ -131,27 +135,32 @@ var MapController = new function(){
 	            },
 	            animate: true
 	        };
-	    function setNewView() {
-	        autoViewer = setInterval(function(){
-	            // generate two new latlng values within +/- 2.5 degrees of the current coords
-	            if(bounds != undefined){
-	            	// bounds is [[lat,lng], [lat, lng]]
-	            	// 0,0 is lower lat 1,0 is up upper lat
-	            	lat = self.getRandomInRange(bounds[0][0], bounds[1][0], fixed);
-	            	// 0,1 is lower lng, 1,1 is upper lng
-	            	lng = self.getRandomInRange(bounds[0][1], bounds[1][1], fixed);
-	            }else{
-	            	lat = self.getRandomInRange(lat -2.5, lat + 2.5, fixed);
-	           		lng = self.getRandomInRange(lng -2.5, lng + 2.5, fixed);
-	            }
-	            
-	            // new zoom level within the levels of 5 and 8 for easier ability to read the map
-	            newZoom = Math.abs(self.getRandomInRange(zoom -4, zoom + 5, 0));
-	            map.setView({lat: lat, lon: lng}, newZoom, options)
-	        }, 4000);
-	    };
+	    
+	    function setNewView(callback) {
+            // generate two new latlng values within +/- 2.5 degrees of the current coords
+            if(bounds != undefined){
+            	// bounds is [[lat,lng], [lat, lng]]
+            	// 0,0 is lower lat 1,0 is up upper lat
+            	lat = self.getRandomInRange(bounds[0][0], bounds[1][0], fixed);
+            	// 0,1 is lower lng, 1,1 is upper lng
+            	lng = self.getRandomInRange(bounds[0][1], bounds[1][1], fixed);
+            }else{
+            	lat = self.getRandomInRange(lat -2.5, lat + 2.5, fixed);
+           		lng = self.getRandomInRange(lng -2.5, lng + 2.5, fixed);
+            }
+            // new zoom level within the levels of 5 and 8 for easier ability to read the map
+            newZoom = Math.abs(self.getRandomInRange(zoom -4, zoom + 5, 0));
+            map.setView({lat: lat, lon: lng}, newZoom, options)
+            // callback.success();
 
-	    setNewView();
-	};
+        };
 
-} 
+		setNewView();
+
+		self.tileLayer.on("load", function(){
+		    autoViewer = setTimeout(function(){
+		    	setNewView();
+		    }, 4000);
+		});	    
+	};	
+};

@@ -12,13 +12,13 @@ socket.on('start', function(data){
 		$("#testingGIF").hide()
 	}, 3000);
     if(data.bounds){
-       MapController.drawBBOX(map, data.bounds);       
+       MapController.drawBBOX(map, data.bounds);
     }
 	MapController.operateMap(map, data.bounds);
     socket.emit("running", "running");
 });
 socket.on("stop", function(data){
-    clearInterval(autoViewer);    
+    clearInterval(autoViewer);
     $("#map").hide();
     socket.emit("stopped", "stopped");
     toggleMessage();
