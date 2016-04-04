@@ -70,8 +70,10 @@ function toggleMessage(){
 }
 
 function capabilitesClickHandler(){
+	var mapObject
 	$("#getCapabilities").on("click", function(e){
-		masterViewModel.map = mapController.initializeMap(masterViewModel.wmsURL(), masterViewModel.selectedLayers());
+		mapObject= mapController.initializeMap(masterViewModel.wmsURL(), masterViewModel.selectedLayers());
+		masterViewModel.map = mapObject.map
 		var map = masterViewModel.map;
 		mapController.addDrawControls(map);
 		map.on('draw:created', function (e) {

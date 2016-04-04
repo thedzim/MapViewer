@@ -1,10 +1,14 @@
 
 var socket = io('/worker');
 var map;
+var tileLayer
 
 socket.on('start', function(data){
+    var mapObjects;
     if(map == undefined){
-         map = MapController.initializeMap(data.url, data.layerType);
+         mapObjects = MapController.initializeMap(data.url, data.layerType);
+         map = mapObjects.map
+         tileLayer = mapObjects.tileLayer
     }
     $("#map").show();
 	toggleMessage();
@@ -14,12 +18,17 @@ socket.on('start', function(data){
     if(data.bounds){
        MapController.drawBBOX(map, data.bounds);
     }
-	MapController.operateMap(map, data.bounds);
+
+    tileLayer.on("load", function(){
+        setTimeout(MapController.operateMap, 4000, map, data.bounds, MapController);
+    });
+    
+	MapController.operateMap(map, data.bounds, MapController);
     socket.emit("running", "running");
 });
 socket.on("stop", function(data){
-    clearTimeout(autoViewer);
     $("#map").hide();
+    tileLayer.removeEventListener("load", autoviewer);
     socket.emit("stopped", "stopped");
     toggleMessage();
 });

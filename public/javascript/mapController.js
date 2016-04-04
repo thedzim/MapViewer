@@ -2,7 +2,6 @@ var MapController = new function(){
 	var self = this;
 	self.map;
 	self.tileLayer;
-	self.stopped = true;
 	
 	self.initializeMap = function(wmsURL, layerType) {
 	    self.map = new L.map('map', {
@@ -22,6 +21,8 @@ var MapController = new function(){
 	        tms: false
 	    }).addTo(self.map);
 	    self.tileLayer = tileLayer;
+	    self.drawnItems = new L.FeatureGroup();
+	    self.map.addLayer(self.drawnItems);
 	    self.collectMetrics(tileLayer);
 	    
 	    // Add a scale control
@@ -30,10 +31,13 @@ var MapController = new function(){
 	    self.map.addControl(zoomControl);
 	    
 	    // Return the map
-	    return self.map;
+	    return { 
+	    	map: self.map, 
+	    	tileLayer: tileLayer
+	    };
 	};
 
-	self.getCapabilities = function(url, callback) {
+	self.prototype.getCapabilities = function(url, callback) {
 		var self = this;
 		if(url){
 			// Query the server with the GetCapabilities request
@@ -66,8 +70,6 @@ var MapController = new function(){
 	};
 
 	self.addDrawControls = function(map) {
-		var drawnItems = new L.FeatureGroup();
-		map.addLayer(drawnItems);
 		var drawControl = new L.Control.Draw({
 			position: 'topright',
 			draw: {
@@ -77,23 +79,23 @@ var MapController = new function(){
 				marker: false,
 			},
 			edit: {
-				featureGroup: drawnItems
+				featureGroup: self.drawnItems
 			}
 		});
 		map.addControl(drawControl);
 
 		map.on('draw:created', function (e) {
-			drawnItems.addLayer(e.layer);
+			self.drawnItems.clearLayers();
+			self.drawnItems.addLayer(e.layer);
 			return e.layer;
 		});
 	}
 
 	self.drawBBOX = function(map, data){
 		var bounds = [data[0], data[1]];
-		var drawnItems = new L.FeatureGroup();
-		map.addLayer(drawnItems);
+		self.drawnItems.clearLayers();
 		// create an orange rectangle
-		drawnItems.addLayer(L.rectangle(bounds));
+		self.drawnItems.addLayer(L.rectangle(bounds));
 		// zoom the map to the rectangle bounds
 		map.fitBounds(bounds);
 	}
@@ -122,7 +124,6 @@ var MapController = new function(){
 
 	self.operateMap = function(workermap, bounds) {
 	    // initialize some variables
-	    var self = this;
 	    var map = workermap;
 	    var fixed = 5;
 	    var latlng = map.getCenter();
@@ -136,34 +137,19 @@ var MapController = new function(){
 	            },
 	            animate: true
 	        };
-	    
-	    function setNewView(callback) {
-            // generate two new latlng values within +/- 2.5 degrees of the current coords
-            if(bounds != undefined){
-            	// bounds is [[lat,lng], [lat, lng]]
-            	// 0,0 is lower lat 1,0 is up upper lat
-            	lat = self.getRandomInRange(bounds[0][0], bounds[1][0], fixed);
-            	// 0,1 is lower lng, 1,1 is upper lng
-            	lng = self.getRandomInRange(bounds[0][1], bounds[1][1], fixed);
-            }else{
-            	lat = self.getRandomInRange(lat -2.5, lat + 2.5, fixed);
-           		lng = self.getRandomInRange(lng -2.5, lng + 2.5, fixed);
-            }
-            // new zoom level within the levels of 5 and 8 for easier ability to read the map
-            newZoom = Math.abs(self.getRandomInRange(zoom -4, zoom + 5, 0));
-            map.setView({lat: lat, lon: lng}, newZoom, options)
-            // callback.success();
-
-        };
-
-		setNewView();
-
-		self.tileLayer.on("load", function(){
-		    autoViewer = setTimeout(function(){
-		    	if(!self.stopped){
-		    		setNewView();
-		    	}
-		    }, 4000);
-		});	    
-	};	
+        // generate two new latlng values within +/- 2.5 degrees of the current coords
+        if(bounds != undefined){
+        	// bounds is [[lat,lng], [lat, lng]]
+        	// 0,0 is lower lat 1,0 is up upper lat
+        	lat = self.getRandomInRange(bounds[0][0], bounds[1][0], fixed);
+        	// 0,1 is lower lng, 1,1 is upper lng
+        	lng = self.getRandomInRange(bounds[0][1], bounds[1][1], fixed);
+        }else{
+        	lat = self.getRandomInRange(lat -2.5, lat + 2.5, fixed);
+       		lng = self.getRandomInRange(lng -2.5, lng + 2.5, fixed);
+        }
+        // new zoom level within the levels of 5 and 8 for easier ability to read the map
+        newZoom = Math.abs(self.getRandomInRange(zoom -4, zoom + 5, 0));
+        map.setView({lat: lat, lon: lng}, newZoom, options)
+	};
 };
